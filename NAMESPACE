@@ -1,0 +1,16 @@
+##Namespace file for DEGseq package
+useDynLib(DEGseq,.registration = TRUE)
+importClassesFrom(methods, call, character, matrix)
+importFrom(graphics, abline, boxplot, hist, lines, par,
+          plot, points, text)
+importFrom(grDevices, bitmap, dev.list, dev.off, png)
+importFrom(methods, "@<-", as, is, new, slot, "slot<-")
+importFrom(stats, density, dpois, ecdf, fisher.test, loess,
+          loess.control, lowess, median, na.omit, pchisq, pnorm,
+          predict, qnorm, sd)
+importFrom(utils, flush.console, read.table, write.table)
+export("DEGexp")
+export("DEGseq")
+export("getGeneExp")
+export("readGeneExp")
+export("samWrapper")

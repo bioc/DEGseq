@@ -1,0 +1,335 @@
+%\VignetteIndexEntry{DEGseq}
+%\VignetteKeywords{differentially expressed genes}
+%\VignetteDepends{qvalue}
+%\VignettePackage{DEGseq}
+
+\documentclass[11pt]{article}
+\usepackage{Sweave}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage[authoryear,round]{natbib}
+
+\setlength{\textheight}{8.5in}
+\setlength{\textwidth}{6in}
+\setlength{\topmargin}{-0.25in}
+\setlength{\oddsidemargin}{0.25in}
+\setlength{\evensidemargin}{0.25in}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+
+\begin{document}
+\title{\bf How to use the DEGseq Package}
+\author{Likun Wang$^1$$^,$$^2$ and Xi Wang$^1$.}
+\maketitle
+\noindent
+$^1$MOE Key Laboratory of Bioinformatics and Bioinformatics Division, TNLIST /Department
+of Automation, Tsinghua University.\\
+\noindent
+$^2$College of Computer Science and Technology, Jilin University.
+\begin{center}
+{\tt wanglikun@tsinghua.edu.cn}
+\end{center}
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+This document provides a discussion of the functions in the package \Rpackage{DEGseq}. \Rpackage{DEGseq} is
+a free R package for identifying differentially expressed genes from RNA-seq data. The input of \Rpackage{DEGseq} is 
+uniquely mapped reads from RNA-seq data with a gene annotation of the corresponding genome, 
+or gene (or transcript isoform) expression values provided by other programs. 
+The output of \Rpackage{DEGseq} includes a text file and an XHTML summary page. 
+The text file contains the gene expression values for the samples, 
+a \textit{P-value} and two kinds of \textit{Q-values} which are calculated by the methods described in \cite{Benjamini95} 
+and \cite{Storey03} 
+for each gene to denote its expression 
+difference between libraries. 
+
+
+We also provided a function {\tt samWrapper} using the method as described in SAM \citep{Tusher01} 
+which can be applied to compare two sets of samples with multiple replicates or two groups of samples
+from different individuals (e.g. disease samples, case vs. control).
+
+The \Rpackage{DEGseq} package employs library \Rpackage{qvalue} and \Rpackage{samr}, 
+which must be installed in advance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Getting started}
+To load the \Rpackage{DEGseq} package, type {\tt library(DEGseq)}. 
+Total six methods are presented in this package. They are {\tt DEGexp}, 
+{\tt DEGseq}, {\tt samWrapper}, {\tt getGeneExp} and {\tt readGeneExp}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Methods}
+
+\subsection{MA-plot-based method with random sampling model}
+Current observations suggest that typically RNA-seq experiments have low background noise 
+and the Poisson model fits data well. In such cases, users could directly pool the technical replicates 
+for each sample together to get higher sequencing depth and detect subtle gene expression changes.
+
+
+\cite{Jiang09} modeled RNA sequencing as a random sampling process, in which 
+each read is sampled independently and uniformly from every possible nucleotides 
+in the sample. Based on this model, the number of reads 
+coming from a gene (or transcript isoform) follows a binomial distribution 
+(and could be approximated by a Poisson distribution). Using the statistical model, 
+we proposed a novel method based on the MA-plot, 
+which is a statistical analysis tool having been widely used to detect and visualize 
+intensity-dependent ratio of microarray data \citep{Yang02}. 
+
+
+Let $C_1$ and $C_2$ denote the counts of reads mapped to a specific gene obtained from two samples 
+with $C_i \sim binomial(n_i, p_i), i = 1, 2$, where $n_i$ denotes the total number of mapped reads and $p_i$ 
+denotes the probability of a read coming from that gene. We define $M = log_2^{C_1} - log_2^{C_2}$, 
+and $A = (log_2^{C_1} + log_2^{C_2})/2$. 
+We assume that $C_1$ and $C_2$ are independent. Let $X = log_2^{C_1}$ and $Y = log_2^{C_2}$, hence $M = X - Y$ 
+and $A = (X + Y)/2$. 
+We can prove that $X$ and $Y$ follow normal distributions approximately (when $n_i$ is large enough), denote
+
+\begin{equation}
+X \rightarrow  N(log_2(n_1p_1), (\frac{1-p_1}{n_1p_1})(log_2^e)^2) =  N(\mu_X, \sigma^2_X)
+\end{equation} 
+\begin{equation}
+Y \rightarrow  N(log_2(n_2p_2), (\frac{1-p_2}{n_2p_2})(log_2^e)^2) =  N(\mu_Y, \sigma^2_Y)
+\end{equation}
+
+Based on the assumption that $C_1$ and $C_2$ are independent (so $X$ and $Y$ are independent), 
+the distributions of $M$ and $A$ can be obtained:
+\begin{equation}
+M \sim N(\mu_X-\mu_Y, \sigma^2_X+\sigma^2_Y)=N(\mu_M, \sigma^2_M)
+\end{equation}
+\begin{equation}
+A \sim N(\frac{1}{2}(\mu_X+\mu_Y), \frac{1}{4}(\sigma^2_X+\sigma^2_Y))=N(\mu_A, \sigma^2_A)
+\end{equation}
+
+Based on formulas (3) and (4), the conditional distribution of $M$ given 
+that $A = a$ can be obtained: 
+\begin{eqnarray*}
+M|(A=a) \sim N(\mu_M+\rho\frac{\sigma_M}{\sigma_A}(a-\mu_A), \sigma^2_M(1-\rho^2)) , \\
+\rho=\frac{Cov(M,A)}{\sigma_M\sigma_A}=\frac{\sigma^2_X-\sigma^2_Y}{\sigma^2_X+\sigma^2_Y} .
+\end{eqnarray*}
+Thus, 
+\begin{eqnarray*}
+E(M|A=a) & = & \mu_M+\rho\frac{\sigma_M}{\sigma_A}(a-\mu_A) \\
+         & = & \mu_X-\mu_Y+2\frac{\sigma^2_X-\sigma^2_Y}{\sigma^2_X+\sigma^2_Y}(a-\frac{1}{2}(\mu_X+\mu_Y)) .
+\end{eqnarray*}
+and
+\begin{eqnarray*}
+Var(M|A=a) & = & \sigma^2_M(1-\rho^2) \\ 
+           & = & 4\frac{\sigma^2_X\sigma^2_Y}{\sigma^2_X+\sigma^2_Y} .
+\end{eqnarray*}
+
+For gene $g$ with ($A=a$, $M=m$) on the MA-plot of two samples, 
+we do the hypothesis test $H_0: p_1 = p_2 = p$ versus $H_1: p_1 \neq p_2$.
+Based on above deduction,
+        $$\mu_A=\frac{1}{2}(\mu_X+\mu_Y)=\frac{1}{2}log_2(n_1n_2p^2) .$$
+Thus, 
+        $$p=\sqrt{2^{2\mu_A}/(n_1n_2)} .$$
+Use $a$ as an estimate of $\mu_A$ then
+        $$\hat{p}=\sqrt{2^{2a}/(n_1n_2)} .$$
+So the estimates of $E(M | A=a)$ and $Var(M | A=a)$ are
+        $$\widehat{E}(M|A=a)=log_2(n_1)-log_2(n_2) ,$$
+and
+        $$\widehat{Var}(M|A=a)=\frac{4(1-\sqrt{2^{2a}/(n_1n_2)})(log_2^e)^2}{(n_1+n_2)\sqrt{2^{2a}/(n_1n_2)}} .$$       
+Then use the two estimates to calculate a \textit{Z-score} for the gene $g$ with ($A=a$, $M=m$), 
+and convert it to a two-sided \textit{P-value} which is used to indicate whether 
+gene $g$ is differentially expressed or not.
+        $$Z-score=\frac{|m-\widehat{E}(M|A=a)|}{\sqrt{\widehat{Var}(M|A=a)}} .$$
+
+Given a \textit{Z-score} threshold, take four as an example, 
+the two lines with the following equations are used to indicate the four-fold 
+local standard deviation of $M$ according to the random sampling model:
+\begin{eqnarray*}
+m_1 & = & \widehat{E}(M|A=a)+4\cdot\sqrt{\widehat{Var}(M|A=a)} \\
+    & = & log_2(n_1)-log_2(n_2)+4\cdot\sqrt{\frac{4(1-\sqrt{2^{2a}/(n_1n_2)})(log_2^e)^2}{(n_1+n_2)\sqrt{2^{2a}/(n_1n_2)}}}
+\end{eqnarray*}
+\begin{eqnarray*}
+m_2 & = & \widehat{E}(M|A=a)-4\cdot\sqrt{\widehat{Var}(M|A=a)} \\
+    & = & log_2(n_1)-log_2(n_2)-4\cdot\sqrt{\frac{4(1-\sqrt{2^{2a}/(n_1n_2)})(log_2^e)^2}{(n_1+n_2)\sqrt{2^{2a}/(n_1n_2)}}}
+\end{eqnarray*}
+
+We call the lines obtained by above equations \textit{theoretical} four-fold local standard deviations lines.
+
+\subsection{MA-plot-based method with technical replicates}
+To estimate the noise level of genes with different intensity, 
+and identify gene expression difference in different sequencing libraries, 
+we proposed another method which is also based on the MA-plot. 
+Here $M$ is the $Y$-axis and represents the intensity ratio, 
+and $A$ is the $X$-axis and represents the average intensity for each transcript. 
+To estimate the random variation, we first draw a MA-plot using two technical replicates (e.g. two sequencing lanes) 
+from the same library. A sliding window (each window includes 1\% points of the MA-plot) is applied to scan the MA-plot 
+along the $A$-axis (average intensity). For the window which is centered at $A=a$, the local variation of $M$ conditioned 
+on $A=a$ is estimated by all the $M$ values of the transcripts in the window. And a smoothed estimate of 
+the intensity-dependent noise level (local variation of $M$) is estimated by lowess regression among the windows, 
+and converted to the standard deviation, under the assumption of normal distribution. 
+The local standard deviations $\sigma_a$ of $M$ conditioned on $A=a$ were then used to compare the observed difference between 
+two different libraries. Next, we draw a second MA-plot for the data from two different libraries. 
+For each transcript $g$ with ($A=a_g$, $M=m_g$) on the MA-plot, a \textit{Z-score} $=|m_g-\mu_g|/\sigma_g$ is calculated to evaluate whether 
+this transcript is differentially expressed, where $\mu_g$ is the local mean of $M$ and $\sigma_g$ is the local standard deviation 
+of $M$ conditioned on $A=a_g$ estimated by technical replicates. Finally, a \textit{P-value} is assigned to this gene according to 
+the \textit{Z-score} under the assumption of normal distribution.
+
+\section{Data}
+The test RNA-seq data are from \cite{Marioni08}. 
+In their research, the RNA samples from human liver and kidney were analyzed using the 
+Illumina Genome Analyzer sequencing platform. 
+Each sample was sequenced in seven lanes, split across two runs of the machine.
+The raw data are available in the NCBI short 
+read archive with accession number {\tt SRA000299}.
+Please see \cite{Marioni08} for more details.
+
+\section{Examples}
+\subsection{Example for DEGexp}
+If users already have the gene expression values (such as the number of reads mapped to each gene),
+this method can be used to identify differentially expressed genes between two samples
+with or without multiple technical replicates directly.
+In the package, there are test data for this method. The file GeneExpExample5000.txt includes the first 5000 lines 
+in SupplementaryTable2.txt which is a supplementary file for \cite{Marioni08}. In this file, each line
+includes the count of reads mapped to a gene for 14 lanes respectively (7 lanes for 
+kidney and 7 lanes for liver). In the following examples, we only use the data sequenced at a concentration 
+of 3 pM (five lanes for each sample). If the data files are collected 
+in a zip archive, the following commands will first extract them from the archive to the temporary directory.
+
+<<echo=TRUE,print=FALSE>>=
+  library(DEGseq)
+  geneExpFile <- system.file("data", "GeneExpExample5000.txt", package="DEGseq")
+  if(geneExpFile == ""){
+     zipFile <- system.file("data", "Rdata.zip", package="DEGseq")
+     if(zipFile != ""){
+        unzip(zipFile, "GeneExpExample5000.txt", exdir=tempdir())
+        geneExpFile <- file.path(tempdir(), "GeneExpExample5000.txt")
+     }
+  }
+@
+\noindent
+To identify differentially expressed genes between the two samples (kidney and liver),
+we first used the method {\tt MARS}: MA-plot-based method with Random Sampling model.
+Five report graphs for the two samples will be shown following the example commands.
+  
+\begin{center}
+<<echo=TRUE,print=FALSE,fig=TRUE>>=
+layout(matrix(c(1,2,3,4,5,6), 3, 2, byrow=TRUE))
+par(mar=c(2, 2, 2, 2))
+DEGexp(geneExpFile1=geneExpFile, expCol1=c(7,9,12,15,18), groupLabel1="kidney", 
+       geneExpFile2=geneExpFile, expCol2=c(8,10,11,13,16), groupLabel2="liver",
+       method="MARS")
+@
+\end{center}
+
+\noindent
+The red points in the last graph (MA-plot) are the genes identified as differentially expressed.
+If the {\tt outputDir} is specified, 
+a text file and an XHTML summary page will be generated. 
+These files can be found in the output directory. 
+
+Next, we performed the function {\tt DEGexp} with the method {\tt MATR}: 
+MA-plot-based method with technical replicates.
+
+\begin{center}
+<<echo=TRUE,print=FALSE,fig=TRUE,results=hide>>=
+layout(matrix(c(1,2,3,4,5,6), 3, 2, byrow=TRUE))
+par(mar=c(2, 2, 2, 2))
+DEGexp(geneExpFile1=geneExpFile, expCol1=7, groupLabel1="kidneyR1L1", 
+       geneExpFile2=geneExpFile, expCol2=8, groupLabel2="liverR1L2",
+       replicate1=geneExpFile, expColR1=9, replicate2=geneExpFile, expColR2=12,
+       replicateLabel1="kidneyR1L3", replicateLabel2="kidneyR1L7",
+       method="MATR")
+@
+\end{center}
+
+\noindent
+The red points in the last graph (MA-plot) are the genes identified as differentially expressed.
+The blue points are from the replicates (kidneyR1L3 and kidneyR1L7), 
+and the blue lines show the four-fold local standard deviation of $M$ estimated by the two technical replicates.
+
+\subsection{Example for DEGseq}
+The method {\tt DEGseq} takes uniquely mapped reads from RNA-seq data with a gene annotation as input. 
+This function
+first counts the number of reads mapped to each gene for samples with or without multiple technical replicates.
+And then it invokes {\tt DEGexp} to identify significant genes.
+
+<<echo=TRUE,print=FALSE>>=
+  kidneyR1L1 <- system.file("data", "kidneyChr21.bed.txt", package="DEGseq")
+  liverR1L2  <- system.file("data", "liverChr21.bed.txt", package="DEGseq")
+  refFlat    <- system.file("data", "refFlatChr21.txt", package="DEGseq")
+  mapResultBatch1 <- c(kidneyR1L1)  ## only use the data from kidneyR1L1 and liverR1L2
+  mapResultBatch2 <- c(liverR1L2)
+  outputDir <- file.path(tempdir(), "DEGseqExample")
+  DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", refFlat=refFlat,
+         outputDir=outputDir, method="LRT")
+@
+
+\subsection{Example for samWrapper}
+To compare two sets of samples with multiple replicates or two groups of samples from different individuals 
+(e.g. disease samples vs. control samples), we provided a method which employs the methods in package \Rpackage{samr}. 
+The strategy used in \Rpackage{samr} was first described in \cite{Tusher01}, 
+and is used for significance analysis of microarrays.
+
+
+\begin{center}
+<<echo=TRUE,print=FALSE,results=hide>>=
+  geneExpFile <- system.file("data", "GeneExpExample1000.txt", package="DEGseq")
+  set.seed(100)
+  geneExpFile1 <- geneExpFile 
+  geneExpFile2 <- geneExpFile
+  output <- file.path(tempdir(), "samWrapperOut.txt")
+  expCol1=c(7,9,12,15,18)
+  expCol2=c(8,10,11,13,16)
+  measure1=c(-1,-2,-3,-4,-5)
+  measure2=c(1,2,3,4,5)
+  samWrapper(geneExpFile1=geneExpFile1, geneCol1=1, expCol1=expCol1, measure1=measure1,
+             geneExpFile2=geneExpFile2, geneCol2=1, expCol2=expCol2, measure2=measure2,
+             nperms=100, min.foldchange=2, max.qValue=1e-4, output=output, paired=TRUE)
+@
+\end{center}
+\noindent
+For the advanced users, please see samr \url{http://cran.r-project.org/web/packages/samr/index.html}
+for detail. 
+
+\subsection{Example for getGeneExp}
+This method is used to count the number of reads mapped to each gene for one sample.
+The sample can have multiple technical replicates.
+The input of this method is the uniquely mapped reads with a gene annotation. And 
+the output is a text file containing gene expression values for the sample. For example,
+<<echo=TRUE,print=FALSE>>=
+  kidneyR1L1 <- system.file("data", "kidneyChr21.bed.txt", package="DEGseq")
+  refFlat    <- system.file("data", "refFlatChr21.txt", package="DEGseq")
+  mapResultBatch <- c(kidneyR1L1)
+  output <- file.path(tempdir(), "kidneyChr21.bed.exp")
+  getGeneExp(mapResultBatch, refFlat=refFlat, output=output)
+  exp <-readGeneExp(file=output, geneCol=1, valCol=c(2,3), label=c("raw count", "RPKM"))
+  exp[30:32,]
+@
+The gene annotation file must follow the UCSC refFlat format.
+See \url{http://genome.ucsc.edu/goldenPath/gbdDescriptionsOld.html#RefFlat}. 
+
+\subsection{Example for readGeneExp}
+This function is used to read gene expression values from a file to a matrix in R workspace. 
+For example,
+<<echo=TRUE,print=FALSE>>=
+  geneExpFile <- system.file("data", "GeneExpExample1000.txt", package="DEGseq")
+  exp <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(7,9,12,15,18,8,10,11,13,16))
+  exp[30:32,]
+@
+\section{The relation between DEGseq and edgeR}
+The package \Rpackage{edgeR} implements the method based on negative 
+binominal distribution to model overdispersion relative to Poisson for digital 
+gene expression data with small replicates \citep{Robinson07}. 
+The methods in \Rpackage{edgeR} first estimate the dispersion
+and then construct an exact test similar to the Fisher's exact test 
+for contingency tables but replacing the 
+hypergeometric probabilities with negative binomial. 
+According to current published RNA-seq data, typically this technology has low instrument 
+noise and the Poisson model fits data well.
+In this situation, \cite{Robinson09} recommended users perform the methods with 
+the dispersion parameter $\phi$ set to 0 
+(as $\phi\rightarrow0$, the negative binominal distribution reduces to the Poisson).
+
+Some methods in \Rpackage{DEGseq} are also based on the Poisson model. But the MA-plot-based methods 
+employ MA-plot to identify and visualize significant genes. Besides, our package can help users 
+calculate the count of reads mapped to each gene with the gene annotation file in UCSC refFlat format.
+The methods in the two packages complement each other. Both the packages can be used to identify significant genes
+from RNA-seq data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newpage
+\bibliographystyle{apalike}
+\bibliography{DEGseq}
+\end{document}
