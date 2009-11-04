@@ -7,7 +7,7 @@ Maintainer: Likun Wang <wanglikun@tsinghua.edu.cn>
 Depends: R (>= 2.8.0), qvalue, samr, methods
 Imports: graphics, grDevices, methods, stats, utils
 License: LGPL (>=2)
-biocViews: RNAseq Preprocessing GeneExpression DifferentialExpression 
+biocViews: RNAseq, Preprocessing, GeneExpression, DifferentialExpression 
 Collate: AllClasses.R AllGenerics.R Bind.R methodPlots.R NormMethods.R
          functions.R IdentifyDiffExpGenes.R MainFunction.R MainFunctionWrap.R
          samWrapper.R
