@@ -53,7 +53,7 @@ samWrapper(geneExpFile1, geneCol1=1, expCol1=2, measure1=rep(1, length(expCol1))
 }
 
 \references{
-  Tusher,V., and et al. (2001): Significance analysis of microarrays applied to the ionizing radiation response \emph{PNAS} \bold{98}, 5116-5121.
+  Tusher,V.G., and et al. (2001): Significance analysis of microarrays applied to the ionizing radiation response \emph{PNAS} \bold{98}, 5116-5121.
   
   Tibshirani,R, and et al.: samr \url{http://cran.r-project.org/web/packages/samr/index.html}.
   

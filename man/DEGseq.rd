@@ -82,13 +82,13 @@ DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
   Jiang,H. and Wong,W.H. (2009) Statistical inferences for isoform expression in RNA-seq.
   \emph{Bioinformatics}, \bold{25}, 1026-1032.
 
-  Joshua,S.B. et al. (2009) Measuring differential gene expression by short read sequencing: quantitative comparison to
+  Bloom,J.S. et al. (2009) Measuring differential gene expression by short read sequencing: quantitative comparison to
   2-channel gene expression microarrays. \emph{BMC Genomics},  \bold{10}, 221.
 
   Marioni,J.C. et al. (2008) RNA-seq: an assessment of technical reproducibility and comparison with gene expression arrays.
   \emph{Genome Res.}, \bold{18}, 1509-1517.
 
-  Storey,J. and Tibshirani,R. (2003) Statistical significance for genomewide studies. \emph{Proc. Natl. Acad. Sci.} \bold{100}, 9440-9445.
+  Storey,J.D. and Tibshirani,R. (2003) Statistical significance for genomewide studies. \emph{Proc. Natl. Acad. Sci.} \bold{100}, 9440-9445.
   
   Wang,L.K. and et al. (2009) DEGseq: an R package to identify differentially expressed genes from RNA-seq data. Submitted.
   
