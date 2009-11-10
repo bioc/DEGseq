@@ -109,7 +109,7 @@ DEGseq.aln(alnBatch1, alnBatch2,
   alnBatch1 <- list(kidneyR1L1_aln)  ## only use the data from kidneyR1L1 and liverR1L2
   alnBatch2 <- list(liverR1L2_aln)
   outputDir <- file.path(tempdir(), "DEGseqAlnExample")
-  DEGseq.aln(alnBatch1, alnBatch2, refFlat=refFlat, outputDir=outputDir, method="LRT")
+  DEGseq.aln(alnBatch1, alnBatch2, refFlat=refFlat, outputDir=outputDir, method="MARS")
   cat("outputDir:", outputDir, "\n")
 }
 \keyword{methods}
