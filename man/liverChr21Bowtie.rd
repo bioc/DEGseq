@@ -1,6 +1,6 @@
-\name{liverChr21.bed}
-\alias{liverChr21.bed}
-\title{liverChr21.bed}
+\name{liverChr21Bowtie}
+\alias{liverChr21Bowtie}
+\title{liverChr21Bowtie}
 \description{
   The reads uniquely mapped to human chromosome 21 obtained from the liver sample sequenced in Run 1, Lane 2.
 }

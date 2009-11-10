@@ -184,19 +184,15 @@ In the package, there are test data for this method. The file GeneExpExample5000
 in SupplementaryTable2.txt which is a supplementary file for \cite{Marioni08}. In this file, each line
 includes the count of reads mapped to a gene for 14 lanes respectively (7 lanes for 
 kidney and 7 lanes for liver). In the following examples, we only use the data sequenced at a concentration 
-of 3 pM (five lanes for each sample). If the data files are collected 
-in a zip archive, the following commands will first extract them from the archive to the temporary directory.
+of 3 pM (five lanes for each sample). 
 
 <<echo=TRUE,print=FALSE>>=
   library(DEGseq)
-  geneExpFile <- system.file("data", "GeneExpExample5000.txt", package="DEGseq")
-  if(geneExpFile == ""){
-     zipFile <- system.file("data", "Rdata.zip", package="DEGseq")
-     if(zipFile != ""){
-        unzip(zipFile, "GeneExpExample5000.txt", exdir=tempdir())
-        geneExpFile <- file.path(tempdir(), "GeneExpExample5000.txt")
-     }
-  }
+  geneExpFile <- system.file("extdata", "GeneExpExample5000.txt", package="DEGseq")
+  geneExpMatrix1 <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(7,9,12,15,18))
+  geneExpMatrix2 <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(8,10,11,13,16))
+  write.table(geneExpMatrix1[30:31,],row.names=FALSE)
+  write.table(geneExpMatrix2[30:31,],row.names=FALSE)
 @
 \noindent
 To identify differentially expressed genes between the two samples (kidney and liver),
@@ -207,8 +203,8 @@ Five report graphs for the two samples will be shown following the example comma
 <<echo=TRUE,print=FALSE,fig=TRUE>>=
 layout(matrix(c(1,2,3,4,5,6), 3, 2, byrow=TRUE))
 par(mar=c(2, 2, 2, 2))
-DEGexp(geneExpFile1=geneExpFile, expCol1=c(7,9,12,15,18), groupLabel1="kidney", 
-       geneExpFile2=geneExpFile, expCol2=c(8,10,11,13,16), groupLabel2="liver",
+DEGexp(geneExpMatrix1=geneExpMatrix1, geneCol1=1, expCol1=c(2,3,4,5,6), groupLabel1="kidney",
+       geneExpMatrix2=geneExpMatrix2, geneCol2=1, expCol2=c(2,3,4,5,6), groupLabel2="liver",
        method="MARS")
 @
 \end{center}
@@ -226,9 +222,9 @@ MA-plot-based method with technical replicates.
 <<echo=TRUE,print=FALSE,fig=TRUE,results=hide>>=
 layout(matrix(c(1,2,3,4,5,6), 3, 2, byrow=TRUE))
 par(mar=c(2, 2, 2, 2))
-DEGexp(geneExpFile1=geneExpFile, expCol1=7, groupLabel1="kidneyR1L1", 
-       geneExpFile2=geneExpFile, expCol2=8, groupLabel2="liverR1L2",
-       replicate1=geneExpFile, expColR1=9, replicate2=geneExpFile, expColR2=12,
+DEGexp(geneExpMatrix1=geneExpMatrix1, expCol1=2, groupLabel1="kidneyR1L1", 
+       geneExpMatrix2=geneExpMatrix2, expCol2=2, groupLabel2="liverR1L2",
+       replicateExpMatrix1=geneExpMatrix1, expColR1=3, replicateExpMatrix2=geneExpMatrix1, expColR2=4,
        replicateLabel1="kidneyR1L3", replicateLabel2="kidneyR1L7",
        method="MATR")
 @
@@ -246,9 +242,9 @@ first counts the number of reads mapped to each gene for samples with or without
 And then it invokes {\tt DEGexp} to identify significant genes.
 
 <<echo=TRUE,print=FALSE>>=
-  kidneyR1L1 <- system.file("data", "kidneyChr21.bed.txt", package="DEGseq")
-  liverR1L2  <- system.file("data", "liverChr21.bed.txt", package="DEGseq")
-  refFlat    <- system.file("data", "refFlatChr21.txt", package="DEGseq")
+  kidneyR1L1 <- system.file("extdata", "kidneyChr21.bed.txt", package="DEGseq")
+  liverR1L2  <- system.file("extdata", "liverChr21.bed.txt", package="DEGseq")
+  refFlat    <- system.file("extdata", "refFlatChr21.txt", package="DEGseq")
   mapResultBatch1 <- c(kidneyR1L1)  ## only use the data from kidneyR1L1 and liverR1L2
   mapResultBatch2 <- c(liverR1L2)
   outputDir <- file.path(tempdir(), "DEGseqExample")
@@ -265,7 +261,7 @@ and is used for significance analysis of microarrays.
 
 \begin{center}
 <<echo=TRUE,print=FALSE,results=hide>>=
-  geneExpFile <- system.file("data", "GeneExpExample1000.txt", package="DEGseq")
+  geneExpFile <- system.file("extdata", "GeneExpExample1000.txt", package="DEGseq")
   set.seed(100)
   geneExpFile1 <- geneExpFile 
   geneExpFile2 <- geneExpFile
@@ -289,13 +285,12 @@ The sample can have multiple technical replicates.
 The input of this method is the uniquely mapped reads with a gene annotation. And 
 the output is a text file containing gene expression values for the sample. For example,
 <<echo=TRUE,print=FALSE>>=
-  kidneyR1L1 <- system.file("data", "kidneyChr21.bed.txt", package="DEGseq")
-  refFlat    <- system.file("data", "refFlatChr21.txt", package="DEGseq")
+  kidneyR1L1 <- system.file("extdata", "kidneyChr21.bed.txt", package="DEGseq")
+  refFlat    <- system.file("extdata", "refFlatChr21.txt", package="DEGseq")
   mapResultBatch <- c(kidneyR1L1)
   output <- file.path(tempdir(), "kidneyChr21.bed.exp")
-  getGeneExp(mapResultBatch, refFlat=refFlat, output=output)
-  exp <-readGeneExp(file=output, geneCol=1, valCol=c(2,3), label=c("raw count", "RPKM"))
-  exp[30:32,]
+  exp <- getGeneExp(mapResultBatch, refFlat=refFlat, output=output)
+  write.table(exp[30:32,], row.names=FALSE)
 @
 The gene annotation file must follow the UCSC refFlat format.
 See \url{http://genome.ucsc.edu/goldenPath/gbdDescriptionsOld.html#RefFlat}. 
@@ -304,10 +299,34 @@ See \url{http://genome.ucsc.edu/goldenPath/gbdDescriptionsOld.html#RefFlat}.
 This function is used to read gene expression values from a file to a matrix in R workspace. 
 For example,
 <<echo=TRUE,print=FALSE>>=
-  geneExpFile <- system.file("data", "GeneExpExample1000.txt", package="DEGseq")
+  geneExpFile <- system.file("extdata", "GeneExpExample1000.txt", package="DEGseq")
   exp <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(7,9,12,15,18,8,10,11,13,16))
-  exp[30:32,]
+  write.table(exp[30:32,], row.names=FALSE)
 @
+\section{Make use of the functions provided by rtracklayer and ShortRead to import files containing aligned reads}
+To import files containing aligned reads, users can make use of the functionas provided by rtracklayer and ShortRead.
+For example,
+<<echo=TRUE,print=FALSE>>=
+  kidneyR1L1 <- system.file("extdata", "kidneyChr21Bowtie.txt", package="DEGseq")
+  liverR1L2  <- system.file("extdata", "liverChr21Bowtie.txt", package="DEGseq")
+  refFlat    <- system.file("extdata", "refFlatChr21.txt", package="DEGseq")
+  kidneyR1L1_aln <- ShortRead::readAligned(dirname(kidneyR1L1), basename(kidneyR1L1), type="Bowtie")
+  liverR1L2_aln <- ShortRead::readAligned(dirname(liverR1L2), basename(liverR1L2), type="Bowtie")
+  alnBatch1 <- list(kidneyR1L1_aln)  ## only use the data from kidneyR1L1 and liverR1L2
+  alnBatch2 <- list(liverR1L2_aln)
+  outputDir <- file.path(tempdir(), "DEGseqAlnExample")
+  DEGseq.aln(alnBatch1, alnBatch2, refFlat=refFlat, outputDir=outputDir, method="LRT")
+  cat("outputDir:", outputDir, "\n")
+@
+To count the number of reads for each gene, we can use the method {\tt getGeneExp.aln}. For example,
+<<echo=TRUE,print=FALSE>>=
+  alnBatch <- list(kidneyR1L1_aln, liverR1L2_aln)
+  output <- file.path(tempdir(), "kidneyChr21Bowtie.exp")
+  exp <- getGeneExp.aln(alnBatch, refFlat=refFlat, output=output)
+  write.table(exp[30:32,], row.names=FALSE)
+  cat("output: ", output, "\n")
+@
+See also {\tt ?DEGseq.rng} and {\tt ?getGeneExp.rng} for more detail.
 \section{The relation between DEGseq and edgeR}
 The package \Rpackage{edgeR} implements the method based on negative 
 binominal distribution to model overdispersion relative to Poisson for digital 

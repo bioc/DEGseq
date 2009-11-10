@@ -1,36 +1,40 @@
-\name{DEGexp}
-\alias{DEGexp}
-\title{DEGexp: Identifying Differentially Expressed Genes from gene expression data}
+\name{DEGexp2}
+\alias{DEGexp2}
+\title{DEGexp2: Identifying Differentially Expressed Genes from gene expression data}
 \description{
-   This function is used to identify differentially expressed genes when users already
-   have the gene expression values (such as the number of reads mapped to each gene).  
+   This function is another version of DEGexp. It takes the gene expression files as input instead of gene expression matrixs.  
 }
 \usage{
-DEGexp(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), groupLabel1="group1",
-       geneExpMatrix2, geneCol2=1, expCol2=2, depth2=rep(0, length(expCol2)), groupLabel2="group2",
-       method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"), 
-       pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4, 
-       thresholdKind=1, outputDir="none", normalMethod=c("none", "loess", "median"),
-       replicateExpMatrix1=NULL, geneColR1=1, expColR1=2, depthR1=rep(0, length(expColR1)), replicateLabel1="replicate1",
-       replicateExpMatrix2=NULL, geneColR2=1, expColR2=2, depthR2=rep(0, length(expColR2)), replicateLabel2="replicate2", rawCount=TRUE)
+DEGexp2(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), groupLabel1="group1",
+        geneExpFile2, geneCol2=1, expCol2=2, depth2=rep(0, length(expCol2)), groupLabel2="group2",
+        header=TRUE, sep="", method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"), 
+        pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4, 
+        thresholdKind=1, outputDir="none", normalMethod=c("none", "loess", "median"),
+        replicate1="none", geneColR1=1, expColR1=2, depthR1=rep(0, length(expColR1)), replicateLabel1="replicate1",
+        replicate2="none", geneColR2=1, expColR2=2, depthR2=rep(0, length(expColR2)), replicateLabel2="replicate2", rawCount=TRUE)
 }
 \arguments{
-  \item{geneExpMatrix1}{gene expression matrix for replicates of sample1 (or replicate1 when \code{method="CTR"}).}
-  \item{geneCol1}{gene id column in geneExpMatrix1.}
-  \item{expCol1}{expression value \emph{columns} in geneExpMatrix1 for replicates of sample1 (numeric vector).
+  \item{geneExpFile1}{file containing gene expression values for replicates of sample1 (or replicate1 when \code{method="CTR"}).}
+  \item{geneCol1}{gene id column in geneExpFile1.}
+  \item{expCol1}{expression value \emph{columns} in geneExpFile1 for replicates of sample1 (numeric vector).
                  \cr \emph{Note}: Each column corresponds to a replicate of sample1.
                 }
   \item{depth1}{the total number of reads uniquely mapped to genome for each replicate of sample1 (numeric vector),
                 \cr default: take the total number of reads mapped to all annotated genes as the depth for each replicate.}
   \item{groupLabel1}{label of group1 on the plots.}
-  \item{geneExpMatrix2}{gene expression matrix for replicates of sample2 (or replicate2 when \code{method="CTR"}).}
-  \item{geneCol2}{gene id column in geneExpMatrix2.}
-  \item{expCol2}{expression value \emph{columns} in geneExpMatrix2 for replicates of sample2 (numeric vector).
+  \item{geneExpFile2}{file containing gene expression values for replicates of sample2 (or replicate2 when \code{method="CTR"}).}
+  \item{geneCol2}{gene id column in geneExpFile2.}
+  \item{expCol2}{expression value \emph{columns} in geneExpFile2 for replicates of sample2 (numeric vector).
                  \cr \emph{Note}: Each column corresponds to a replicate of sample2.
                 }
   \item{depth2}{the total number of reads uniquely mapped to genome for each replicate of sample2 (numeric vector),
                 \cr default: take the total number of reads mapped to all annotated genes as the depth for each replicate.}
   \item{groupLabel2}{label of group2 on the plots.}
+  \item{header}{a logical value indicating whether geneExpFile1 and geneExpFile2
+                contain the names of the variables as its first line. See \code{?read.table}.}
+  \item{sep}{the field separator character. If sep = "" (the default for read.table)
+             the separator is \emph{white space}, that is one or more spaces, tabs, newlines or carriage returns.
+             See \code{?read.table}.}
   \item{method}{method to identify differentially expressed genes. Possible methods are:
                  \itemize{
                   \item \code{ "LRT"}:  Likelihood Ratio Test (Marioni et al. 2008),
@@ -60,17 +64,17 @@ DEGexp(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), gr
   \item{outputDir}{the output directory.}
   \item{normalMethod}{the normalization method: \code{"none", "loess", "median"} (Yang et al. 2002). 
                       \cr recommend: \code{"none"}. }
-  \item{replicateExpMatrix1}{matrix containing gene expression values for replicate batch1 (only used when \code{method="MATR"}).
+  \item{replicate1}{file containing gene expression values for replicate batch1 (only used when \code{method="MATR"}).
                     \cr \emph{Note}: replicate1 and replicate2 are two (groups of) technical replicates of a sample.}
-  \item{geneColR1}{gene id column in the expression matrix for replicate batch1 (only used when \code{method="MATR"}).}
-  \item{expColR1}{expression value \emph{columns} in the expression matrix for replicate batch1 (numeric vector) (only used when \code{method="MATR"}).}
+  \item{geneColR1}{gene id column in the expression file for replicate batch1 (only used when \code{method="MATR"}).}
+  \item{expColR1}{expression value \emph{columns} in the expression file for replicate batch1 (numeric vector) (only used when \code{method="MATR"}).}
   \item{depthR1}{the total number of reads uniquely mapped to genome for each replicate in replicate batch1 (numeric vector),
                  \cr default: take the total number of reads mapped to all annotated genes as the depth for each replicate (only used when \code{method="MATR"}).}
   \item{replicateLabel1}{label of replicate batch1 on the plots (only used when \code{method="MATR"}).}
-  \item{replicateExpMatrix2}{matrix containing gene expression values for replicate batch2 (only used when \code{method="MATR"}).
+  \item{replicate2}{file containing gene expression values for replicate batch2 (only used when \code{method="MATR"}).
                     \cr \emph{Note}: replicate1 and replicate2 are two (groups of) technical replicates of a sample.}
-  \item{geneColR2}{gene id column in the expression matrix for replicate batch2 (only used when \code{method="MATR"}).}
-  \item{expColR2}{expression value \emph{columns} in the expression matrix for replicate batch2 (numeric vector) (only used when \code{method="MATR"}).}
+  \item{geneColR2}{gene id column in the expression file for replicate batch2 (only used when \code{method="MATR"}).}
+  \item{expColR2}{expression value \emph{columns} in the expression file for replicate batch2 (numeric vector) (only used when \code{method="MATR"}).}
   \item{depthR2}{the total number of reads uniquely mapped to genome for each replicate in replicate batch2 (numeric vector),
                  \cr default: take the total number of reads mapped to all annotated genes as the depth for each replicate (only used when \code{method="MATR"}).}
   \item{replicateLabel2}{label of replicate batch2 on the plots (only used when \code{method="MATR"}).}
@@ -98,7 +102,7 @@ DEGexp(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), gr
   slide systematic variation. \emph{Nucleic Acids Research}, \bold{30}, e15.
 }
 \seealso{
- \code{\link{DEGexp2}},
+ \code{\link{DEGexp}},
  \code{\link{DEGseq}},
  \code{\link{getGeneExp}},
  \code{\link{readGeneExp}},
@@ -107,19 +111,19 @@ DEGexp(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), gr
 }
      
 \examples{
+  
   ## kidney: R1L1Kidney, R1L3Kidney, R1L7Kidney, R2L2Kidney, R2L6Kidney 
   ## liver: R1L2Liver, R1L4Liver, R1L6Liver, R1L8Liver, R2L3Liver
   
   geneExpFile <- system.file("extdata", "GeneExpExample5000.txt", package="DEGseq")
-  cat("geneExpFile:", geneExpFile, "\n")
   outputDir <- file.path(tempdir(), "DEGexpExample")
-  geneExpMatrix1 <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(7,9,12,15,18))
-  geneExpMatrix2 <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(8,10,11,13,16))
-  geneExpMatrix1[30:32,]
-  geneExpMatrix2[30:32,]
-  DEGexp(geneExpMatrix1=geneExpMatrix1, geneCol1=1, expCol1=c(2,3,4,5,6), groupLabel1="kidney",
-         geneExpMatrix2=geneExpMatrix2, geneCol2=1, expCol2=c(2,3,4,5,6), groupLabel2="liver",
-         method="LRT", outputDir=outputDir)
+  exp <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(7,9,12,15,18))
+  exp[30:35,]
+  exp <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(8,10,11,13,16))
+  exp[30:35,]
+  DEGexp2(geneExpFile1=geneExpFile, geneCol1=1, expCol1=c(7,9,12,15,18), groupLabel1="kidney",
+          geneExpFile2=geneExpFile, geneCol2=1, expCol2=c(8,10,11,13,16), groupLabel2="liver",
+          method="MARS", outputDir=outputDir)
   cat("outputDir:", outputDir, "\n")
 }
 \keyword{methods}

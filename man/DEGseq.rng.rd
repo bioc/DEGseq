@@ -1,30 +1,23 @@
-\name{DEGseq}
-\alias{DEGseq}
-\title{DEGseq: Identify Differentially Expressed Genes from RNA-seq data}
+\name{DEGseq.rng}
+\alias{DEGseq.rng}
+\title{DEGseq.rng: Identify Differentially Expressed Genes from RNA-seq data (deal with the objects of class RangedData)}
 \description{
   This function is used to identify differentially expressed genes from RNA-seq data. It takes uniquely mapped
   reads from RNA-seq data for the two samples with a gene annotation as input. 
   So users should map the reads (obtained from sequencing libraries of the samples) to the corresponding genome in advance.
 }
 \usage{
-DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
-       strandInfo=FALSE, refFlat, groupLabel1="group1", groupLabel2="group2",
-       method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"), 
-       pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4, thresholdKind=1,
-       outputDir="none", normalMethod=c("none", "loess", "median"),
-       depthKind=1, replicate1="none", replicate2="none",
-       replicateLabel1="replicate1", replicateLabel2="replicate2")
+DEGseq.rng(rngBatch1, rngBatch2, 
+           strandInfo=FALSE, refFlat, groupLabel1="group1", groupLabel2="group2",
+           method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"), 
+           pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4, thresholdKind=1,
+           outputDir="none", normalMethod=c("none", "loess", "median"),
+           depthKind=1, replicateRngBatch1=NULL, replicateRngBatch2=NULL,
+           replicateLabel1="replicate1", replicateLabel2="replicate2")
 }
 \arguments{
-  \item{mapResultBatch1}{vector containing uniquely mapping result files for technical replicates of sample1 (or replicate1 when \code{method="CTR"}).}
-  \item{mapResultBatch2}{vector containing uniquely mapping result files for technical replicates of sample2 (or replicate2 when \code{method="CTR"}).}
-  \item{fileFormat}{file format: \code{"bed"} or \code{"eland"}.
-                    \cr example of \code{"bed"} format: \code{chr12    7    38    readID    2    +}
-                    \cr example of \code{"eland"} format: \code{readID    chr12.fa    7    U2    F}
-                    \cr \emph{Note}: The field separator character is \code{TAB}. And the files must
-                        follow the format as one of the examples.
-                   }
-  \item{readLength}{the length of the reads (only used if \code{fileFormat="eland"}).}
+  \item{rngBatch1}{list containing uniquely mapping reads (objects of class RangedData) for technical replicates of sample1 (or replicate1 when \code{method="CTR"}).}
+  \item{rngBatch2}{list containing uniquely mapping reads (objects of class RangedData) for technical replicates of sample2 (or replicate2 when \code{method="CTR"}).}
   \item{strandInfo}{whether the strand information was retained during the cloning of the cDNAs.
                     \itemize{
                     \item \code{"TRUE" }: retained,
@@ -69,12 +62,14 @@ DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
                    \code{0}: take the total number of reads uniquely mapped to all annotated genes as the depth for each replicate. \cr
                    We recommend taking \code{depthKind=1}, 
                    especially when the genes in annotation file are part of all genes.} 
-  \item{replicate1}{files containing uniquely mapped reads obtained from replicate batch1 (only used when \code{method="MATR"}).}
-  \item{replicate2}{files containing uniquely mapped reads obtained from replicate batch2 (only used when \code{method="MATR"}).}
+  \item{replicateRngBatch1}{list containing uniquely mapping reads (objects of class RangedData) obtained from replicate batch1 (only used when \code{method="MATR"}).}
+  \item{replicateRngBatch2}{list containing uniquely mapping reads (objects of class RangedData) obtained from replicate batch2 (only used when \code{method="MATR"}).}
   \item{replicateLabel1}{label of replicate batch1 on the plots (only used when \code{method="MATR"}).}
   \item{replicateLabel2}{label of replicate batch2 on the plots (only used when \code{method="MATR"}).}
 }
-
+\note{
+  Users should use \code{\link{DEGseq}} instead of this function when the short reads are too many to be loaded into memory.
+}
 \references{
   Benjamini,Y. and Hochberg,Y. (1995) Controlling the false discovery rate: a practical and
   powerful approach to multiple testing. \emph{J. R. Stat. Soc. Ser. B} \bold{57}, 289-300.
@@ -97,9 +92,9 @@ DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
 }
 \seealso{
  \code{\link{DEGexp}},
- \code{\link{DEGseq.rng}},
+ \code{\link{DEGseq}},
  \code{\link{DEGseq.aln}},
- \code{\link{getGeneExp}},
+ \code{\link{getGeneExp.rng}},
  \code{\link{readGeneExp}},
  \code{\link{kidneyChr21.bed}},
  \code{\link{liverChr21.bed}},
@@ -109,11 +104,12 @@ DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
   kidneyR1L1 <- system.file("extdata", "kidneyChr21.bed.txt", package="DEGseq")
   liverR1L2  <- system.file("extdata", "liverChr21.bed.txt", package="DEGseq")
   refFlat    <- system.file("extdata", "refFlatChr21.txt", package="DEGseq")
-  mapResultBatch1 <- c(kidneyR1L1)  ## only use the data from kidneyR1L1 and liverR1L2
-  mapResultBatch2 <- c(liverR1L2)
-  outputDir <- file.path(tempdir(), "DEGseqExample")
-  DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", refFlat=refFlat,
-         outputDir=outputDir, method="LRT")
+  kidneyR1L1_track <- rtracklayer::import(kidneyR1L1, format="bed")
+  liverR1L2_track <- rtracklayer::import(liverR1L2, format="bed")
+  rngBatch1 <- list(kidneyR1L1_track)  ## only use the data from kidneyR1L1 and liverR1L2
+  rngBatch2 <- list(liverR1L2_track)
+  outputDir <- file.path(tempdir(), "DEGseqRngExample")
+  DEGseq.rng(rngBatch1, rngBatch2, refFlat=refFlat, outputDir=outputDir, method="LRT")
   cat("outputDir:", outputDir, "\n")
 }
 \keyword{methods}

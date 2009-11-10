@@ -1,25 +1,17 @@
-\name{getGeneExp}
-\alias{getGeneExp}
-\title{getGeneExp: Count the number of reads and calculate the RPKM for each gene}
+\name{getGeneExp.aln}
+\alias{getGeneExp.aln}
+\title{getGeneExp.aln: Count the number of reads and calculate the RPKM for each gene (deal with the objects of class AlignedRead)}
 \description{
   This function is used to count the number of reads and calculate the RPKM for each gene.
   It takes uniquely mapped reads from RNA-seq data for a sample with a gene annotation file as input. 
   So users should map the reads (obtained from sequencing library of the sample) to the corresponding genome in advance.
 }
 \usage{
-getGeneExp(mapResultBatch, fileFormat="bed", readLength=32, strandInfo=FALSE,
-           refFlat, output=paste(mapResultBatch[1],".exp",sep=""), min.overlapPercent=1)
+getGeneExp.aln(alnBatch, strandInfo=FALSE,
+               refFlat, output=paste(mapResultBatch[1],".exp",sep=""), min.overlapPercent=1)
 }
 \arguments{
-  \item{mapResultBatch}{vector containing uniquely mapping result files for a sample.
-                        \cr \emph{Note}: The sample can have multiple technical replicates.}
-  \item{fileFormat}{file format: \code{"bed"} or \code{"eland"}.
-                    \cr example of \code{"bed"} format: \code{chr12    7    38    readID    2    +}
-                    \cr example of \code{"eland"} format: \code{readID    chr12.fa    7    U2    F}
-                    \cr \emph{Note}: The field separator character is \code{TAB}. And the files must
-                        follow the format as one of the examples.
-                   }
-  \item{readLength}{the length of the reads (only used if \code{fileFormat="eland"}).}
+  \item{alnBatch}{list containing the objects of class AlignedRead (package:ShortRead).}
   \item{strandInfo}{whether the strand information was retained during the cloning of the cDNAs.
                      \itemize{
                        \item \code{"TRUE" }: retained,
@@ -36,6 +28,7 @@ getGeneExp(mapResultBatch, fileFormat="bed", readLength=32, strandInfo=FALSE,
                            }
 }
 \note{
+  Users should use \code{\link{getGeneExp}} instead of this function when the short reads are too many to be loaded into memory.
   This function sums up the numbers of reads coming from all exons of a specific gene 
   (according to the known gene annotation) as the gene expression value. 
   The exons may include the 5'-UTR, protein coding region, and 3'-UTR of a gene. 
@@ -43,7 +36,7 @@ getGeneExp(mapResultBatch, fileFormat="bed", readLength=32, strandInfo=FALSE,
   If a read falls in an exon (usually, a read is shorter than an exon), the read count for this exon plus 1. 
   If a read is crossing the boundary of an exon, users can tune the parameter \code{min.overlapPercent}, 
   which is the minimum percentage of the overlapping length for a read and an exon over the length of the read 
-  itself, for counting this read from the exon. 
+  itself, for counting this read from the exon.
   The method use the union of all possible exons for calculating the length for each gene.
 }
 \references{
@@ -52,7 +45,7 @@ getGeneExp(mapResultBatch, fileFormat="bed", readLength=32, strandInfo=FALSE,
 \seealso{
  \code{\link{DEGexp}},
  \code{\link{DEGseq}},
- \code{\link{getGeneExp.aln}},
+ \code{\link{getGeneExp}},
  \code{\link{getGeneExp.rng}},
  \code{\link{readGeneExp}},
  \code{\link{kidneyChr21.bed}},
@@ -61,11 +54,13 @@ getGeneExp(mapResultBatch, fileFormat="bed", readLength=32, strandInfo=FALSE,
 }
      
 \examples{
-  kidneyR1L1 <- system.file("extdata", "kidneyChr21.bed.txt", package="DEGseq")
+  library(ShortRead)
+  kidneyR1L1 <- system.file("extdata", "kidneyChr21Bowtie.txt", package="DEGseq")
   refFlat    <- system.file("extdata", "refFlatChr21.txt", package="DEGseq")
-  mapResultBatch <- list(kidneyR1L1)
-  output <- file.path(tempdir(), "kidneyChr21.bed.exp")
-  exp <- getGeneExp(mapResultBatch, refFlat=refFlat, output=output)
+  kidneyR1L1_aln <- ShortRead::readAligned(dirname(kidneyR1L1), basename(kidneyR1L1), type="Bowtie")
+  alnBatch <- list(kidneyR1L1_aln)
+  output <- file.path(tempdir(), "kidneyChr21Bowtie.exp")
+  exp <- getGeneExp.aln(alnBatch, refFlat=refFlat, output=output)
   write.table(exp[30:35,], row.names=FALSE)
   cat("output: ", output, "\n")
 }

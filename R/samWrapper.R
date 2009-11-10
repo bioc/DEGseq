@@ -55,8 +55,30 @@ samWrapper <- function(geneExpFile1, geneCol1=1, expCol1=2, measure1=rep(1, leng
    cat("output:", output, "\n")
    cat("Please wait...\n")
    
-   group1 <- readGeneExp(geneExpFile1, geneCol=geneCol1, valCol=expCol1, header=TRUE, sep=sep)                 
+   group1 <- readGeneExp(geneExpFile1, geneCol=geneCol1, valCol=expCol1, header=TRUE, sep=sep)
+   d1 <- as.character(dimnames(group1)[[1]])
+   d2 <- as.character(dimnames(group1)[[2]])
+   d2 <- d2[2:ncol(group1)]
+   group1 <- as(group1[,2:ncol(group1)], "matrix")
+   group1 <- matrix(as.numeric(group1), ncol=ncol(group1))
+   dimnames(group1) <- list(d1, d2)
+   if(sum(is.na(group1)) > 0){
+     cat("Some invalid values in the matrix!\n")
+     cat("Please check the input file!\n")
+     stop("");
+   }             
    group2 <- readGeneExp(geneExpFile2, geneCol=geneCol2, valCol=expCol2, header=TRUE, sep=sep)
+   d1 <- as.character(dimnames(group2)[[1]])
+   d2 <- as.character(dimnames(group2)[[2]])
+   d2 <- d2[2:ncol(group2)]
+   group2 <- as(group2[,2:ncol(group2)], "matrix")
+   group2 <- matrix(as.numeric(group2), ncol=ncol(group2))
+   dimnames(group2) <- list(d1, d2)
+   if(sum(is.na(group2)) > 0){
+     cat("Some invalid values in the matrix!\n")
+     cat("Please check the input file!\n")
+     stop("");
+   } 
    ########################################################
    ########################################################
    min_value <- min(min(group1[group1!=0]), min(group2[group2!=0]))

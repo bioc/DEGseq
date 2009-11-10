@@ -30,14 +30,7 @@
   ## If the data files are collected in a zip archive, the following
   ## commands will first extract them to the temporary directory.
 
-  geneExpFile <- system.file("data", "GeneExpExample1000.txt", package="DEGseq")
-  if(geneExpFile == ""){
-     zipFile <- system.file("data", "Rdata.zip", package="DEGseq")
-     if(zipFile != ""){
-        unzip(zipFile, "GeneExpExample1000.txt", exdir=tempdir())
-        geneExpFile <- file.path(tempdir(), "GeneExpExample1000.txt")
-     }
-  }
+  geneExpFile <- system.file("extdata", "GeneExpExample1000.txt", package="DEGseq")
   exp <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(7,9,12,15,18,8,10,11,13,16))
   exp[30:35,]
 }

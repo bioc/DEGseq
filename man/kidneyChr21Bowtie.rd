@@ -1,8 +1,8 @@
-\name{liverChr21.bed}
-\alias{liverChr21.bed}
-\title{liverChr21.bed}
+\name{kidneyChr21Bowtie}
+\alias{kidneyChr21Bowtie}
+\title{kidneyChr21Bowtie}
 \description{
-  The reads uniquely mapped to human chromosome 21 obtained from the liver sample sequenced in Run 1, Lane 2.
+  The reads uniquely mapped to human chromosome 21 obtained from the kidney sample sequenced in Run 1, Lane 1.
 }
 \references{
   Marioni,J.C. et al. (2008) RNA-seq: an assessment of technical reproducibility and comparison with
@@ -13,7 +13,7 @@
  \code{\link{DEGseq}},
  \code{\link{getGeneExp}},
  \code{\link{readGeneExp}},
- \code{\link{kidneyChr21.bed}},
+ \code{\link{liverChr21.bed}},
  \code{\link{refFlatChr21}}.
 }
 \keyword{datasets}

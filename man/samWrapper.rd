@@ -70,14 +70,7 @@ samWrapper(geneExpFile1, geneCol1=1, expCol1=2, measure1=rep(1, length(expCol1))
   ## If the data files are collected in a zip archive, the following
   ## commands will first extract them to the temporary directory.
   
-  geneExpFile <- system.file("data", "GeneExpExample1000.txt", package="DEGseq")
-  if(geneExpFile == ""){
-     zipFile <- system.file("data", "Rdata.zip", package="DEGseq")
-     if(zipFile != ""){
-        unzip(zipFile, "GeneExpExample1000.txt", exdir=tempdir())
-        geneExpFile <- file.path(tempdir(), "GeneExpExample1000.txt")
-     }
-  }
+  geneExpFile <- system.file("extdata", "GeneExpExample1000.txt", package="DEGseq")
   set.seed(100)
   geneExpFile1 <- geneExpFile 
   geneExpFile2 <- geneExpFile

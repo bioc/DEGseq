@@ -1,28 +1,30 @@
-###########################################################################################
+#####################################################
 ########### MainFunction.R
 ########### functions:
-###########            DEGexp
-###########################################################################################
-DEGexp <- function(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), groupLabel1="group1",
-                   geneExpMatrix2, geneCol2=1, expCol2=2, depth2=rep(0, length(expCol2)), groupLabel2="group2",
-                   method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"),
+###########            DEGexp2: the old version of DEGexp
+#####################################################
+DEGexp2 <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), groupLabel1="group1",
+                   geneExpFile2, geneCol2=1, expCol2=2, depth2=rep(0, length(expCol2)), groupLabel2="group2",
+                   header=TRUE, sep="", method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"),
                    pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4,
                    thresholdKind=1, outputDir="none", normalMethod=c("none", "loess", "median"),
-                   replicateExpMatrix1=NULL, geneColR1=1, expColR1=2, depthR1=rep(0, length(expColR1)), replicateLabel1="replicate1",
-                   replicateExpMatrix2=NULL, geneColR2=1, expColR2=2, depthR2=rep(0, length(expColR2)), replicateLabel2="replicate2", rawCount=TRUE){
-    
+                   replicate1="none", geneColR1=1, expColR1=2, depthR1=rep(0, length(expColR1)), replicateLabel1="replicate1",
+                   replicate2="none", geneColR2=1, expColR2=2, depthR2=rep(0, length(expColR2)), replicateLabel2="replicate2", rawCount=TRUE){
+
  dev_cur <- dev.cur();
  cat("Please wait...\n")
  method <- match.arg(method)
  normalMethod <- match.arg(normalMethod)
  for(i in (1:length(expCol1))){
    if(depth1[i] == -1){
-      exp_values <- geneExpMatrix1[,expCol1[i]+2]
+      rt1 <- read.table(geneExpFile1,header=header,sep=sep)
+      exp_values <- as(rt1[expCol1[i]+2], "matrix")
       exp_values[is.na(exp_values)] <- 0
       depth1[i] <- as.numeric(exp_values[1])
    }
    if(depth1[i] == 0){
-      exp_values <- as.numeric(geneExpMatrix1[,expCol1[i]])
+      rt1 <- read.table(geneExpFile1,header=header,sep=sep)
+      exp_values <- as(rt1[expCol1[i]], "matrix")
       exp_values[is.na(exp_values)] <- 0
       depth1[i] <- sum(exp_values)
       warning_msg <- 1
@@ -31,61 +33,68 @@ DEGexp <- function(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(e
 
  for(i in (1:length(expCol2))){
    if(depth2[i] == -1){
-      exp_values <- geneExpMatrix2[,expCol2[i]+2]
+      rt1 <- read.table(geneExpFile2,header=header,sep=sep)
+      exp_values <- as(rt1[expCol2[i]+2], "matrix")
       exp_values[is.na(exp_values)] <- 0
       depth2[i] <- as.numeric(exp_values[1])
    }
    if(depth2[i] == 0){
-      exp_values <- as.numeric(geneExpMatrix2[,expCol2[i]])
+      rt1 <- read.table(geneExpFile2,header=header,sep=sep)
+      exp_values <- as(rt1[expCol2[i]], "matrix")
       exp_values[is.na(exp_values)] <- 0
       depth2[i] <- sum(exp_values)
    }
  }
  
  if(method == "MATR"){
-   if(is.null(replicateExpMatrix1)||is.null(replicateExpMatrix2)){
-      stop("replicateExpMatrix1 and replicateExpMatrix2 can not be null when method=MATR.\n")
-   }
    for(i in (1:length(expColR1))){
        if(depthR1[i] == -1){
-           exp_values <- replicateExpMatrix1[,expColR1[i]+2]
+           rt1 <- read.table(replicate1,header=header,sep=sep)
+           exp_values <- as(rt1[expColR1[i]+2], "matrix")
 	         exp_values[is.na(exp_values)] <- 0
            depthR1[i] <- as.numeric(exp_values[1])
        }
        if(depthR1[i] == 0){
-           exp_values <- as.numeric(replicateExpMatrix1[,expColR1[i]])
+           rt1 <- read.table(replicate1,header=header,sep=sep)
+           exp_values <- as(rt1[expColR1[i]], "matrix")
 	         exp_values[is.na(exp_values)] <- 0
            depthR1[i] <- sum(exp_values)
        }
    }
    for(i in (1:length(expColR2))){
        if(depthR2[i] == -1){
-           exp_values <- replicateExpMatrix2[,expColR2[i]+2]
+           rt1 <- read.table(replicate2,header=header,sep=sep)
+           exp_values <- as(rt1[expColR2[i]+2], "matrix")
 	         exp_values[is.na(exp_values)] <- 0
            depthR2[i] <- as.numeric(exp_values[1])
        }
        if(depthR2[i] == 0){
-           exp_values <- as.numeric(replicateExpMatrix2[,expColR2[i]])
+           rt1 <- read.table(replicate2,header=header,sep=sep)
+           exp_values <- as(rt1[expColR2[i]], "matrix")
 	         exp_values[is.na(exp_values)] <- 0
-           depthR2[i] <- sum(exp_values)
+           depthR2[i] <- sum(exp_values)      
        }
    }
  }
 
- cat("gene id column in geneExpMatrix1 for sample1: ",geneCol1,"\n")
- cat("expression value column(s) in geneExpMatrix1:",expCol1,"\n")
+ cat("\ngeneExpFile1: ",geneExpFile1,"\n")
+ cat("gene id column in geneExpFile1: ",geneCol1,"\n")
+ cat("expression value column(s) in geneExpFile1:",expCol1,"\n")
  cat("total number of reads uniquely mapped to genome obtained from sample1:",depth1,"\n")
 
- cat("gene id column in geneExpMatrix2 for sample2: ",geneCol2,"\n")
- cat("expression value column(s) in geneExpMatrix2:",expCol2,"\n")
+ cat("\ngeneExpFile2: ",geneExpFile2,"\n")
+ cat("gene id column in geneExpFile2: ",geneCol2,"\n")
+ cat("expression value column(s) in geneExpFile2:",expCol2,"\n")
  cat("total number of reads uniquely mapped to genome obtained from sample2:",depth2,"\n\n")
 
- if((!is.null(replicateExpMatrix1))&&(!is.null(replicateExpMatrix2))){
-    cat("gene id column in replicateExpMatrix1: ",geneColR1,"\n")
-    cat("expression value column(s) in replicateExpMatrix1:",expColR1,"\n")
+ if(replicate1 != "none"){
+    cat("replicate1: ",replicate1,"\n")
+    cat("gene id column in the expression file for replicate1: ",geneColR1,"\n")
+    cat("expression value column(s) in the expression file for replicate1:",expColR1,"\n")
     cat("total number of reads uniquely mapped to genome obtained from replicate1:",depthR1,"\n\n")
-    cat("gene id column in replicateExpMatrix2: ",geneColR2,"\n")
-    cat("expression value column(s) in replicateExpMatrix2:",expColR2,"\n")
+    cat("replicate2: ",replicate2,"\n")
+    cat("gene id column in the expression file for replicate2: ",geneColR2,"\n")
+    cat("expression value column(s) in the expression file for replicate2:",expColR2,"\n")
     cat("total number of reads uniquely mapped to genome obtained from replicate2:",depthR2,"\n\n")
  }
 
@@ -163,8 +172,8 @@ DEGexp <- function(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(e
     label1 <- "sample1"
     label2 <- "sample2"
  }
- Sample1 <- ReadLane2(geneExpMatrix1,geneCol=geneCol1,valCol=expCol1,label=label1)
- Sample2 <- ReadLane2(geneExpMatrix2,geneCol=geneCol2,valCol=expCol2,label=label2)
+ Sample1 <- ReadLane(geneExpFile1,geneCol=geneCol1,valCol=expCol1,label=label1,header=header,sep=sep)
+ Sample2 <- ReadLane(geneExpFile2,geneCol=geneCol2,valCol=expCol2,label=label2,header=header,sep=sep)
  png_new("/output/Sample1_hist.png",outputDir)
  scatterMain <- paste(label1," VS ",label2,sep="")
  #label1 <- paste("log2(",label1,")",sep="")
@@ -207,7 +216,7 @@ DEGexp <- function(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(e
 
  Criterion1 <- Sample1
  Criterion2 <- Sample2
- if(method == "MATR"){
+ if(replicate1 != "none"){
     c_label1 <- replicateLabel1
     c_label1 <- substr(c_label1,1,14)
     c_label2 <- replicateLabel2
@@ -216,8 +225,8 @@ DEGexp <- function(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(e
        c_label1 <- "replicate1"
        c_label2 <- "replicate2"
     }
-    Criterion1 <- ReadLane2(replicateExpMatrix1,geneCol=geneColR1,valCol=expColR1,label=c_label1)
-    Criterion2 <- ReadLane2(replicateExpMatrix2,geneCol=geneColR2,valCol=expColR2,label=c_label2)
+    Criterion1 <- ReadLane(replicate1,geneCol=geneColR1,valCol=expColR1,label=c_label1,header=header,sep=sep)
+    Criterion2 <- ReadLane(replicate2,geneCol=geneColR2,valCol=expColR2,label=c_label2,header=header,sep=sep)
     scatterMain <- paste(c_label1," VS ",c_label2,sep="")
     ylab <- paste("log2(read counts for each gene) in ",c_label1,sep="")
     xlab <- paste("log2(read counts for each gene) in ",c_label2,sep="")
@@ -294,7 +303,7 @@ DEGexp <- function(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(e
                      png_new("/output/pre_norm_c.png",outputDir)
                      plot(PairC1C2);
                      LineOnPlot(PairC1C2,"median");
-                     PairC1C2_norm <- maNorm(PairC1C2, "median")
+                     PairC1C2_norm <- maNorm(PairC1C2,"median")
                      png_new("/output/after_norm_c.png",outputDir)
                      plot(PairC1C2_norm)
                      LineOnPlot(PairC1C2_norm,"median")
@@ -497,17 +506,17 @@ output2html("<p class = \"output\">")
 output2html("<br/>")
 output2html("<br/>")
 
-#output2html(paste("geneExpFile1:",geneExpFile1))
-#output2html("<br/>")
+output2html(paste("geneExpFile1:",geneExpFile1))
+output2html("<br/>")
 
-#output2html(paste("geneExpFile2:",geneExpFile2))
-#output2html("<br/>")
+output2html(paste("geneExpFile2:",geneExpFile2))
+output2html("<br/>")
 
-if(method=="MATR"){
-   #output2html(paste("replicate1:",replicate1))
-   #output2html("<br/>")
-   #output2html(paste("replicate2:",replicate2))
-   #output2html("<br/>")
+if(replicate1!="none"){
+   output2html(paste("replicate1:",replicate1))
+   output2html("<br/>")
+   output2html(paste("replicate2:",replicate2))
+   output2html("<br/>")
 }
 
 
@@ -533,44 +542,3 @@ if(outputDir != "none"){
 }
 cat("The results can be observed in directory: ", outputDir, "\n")
 } # main function end
-
-DEV_OFF <- function(off=TRUE, dev_cur=2){    
- for(i in dev.list())
-  if((i != 1) && (off) && (i > dev_cur)){
-    dev.off(i)
-  }
-}
-
-
-#####################################################
-DEGexp3 <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), groupLabel1="group1",
-                   geneExpFile2, geneCol2=1, expCol2=2, depth2=rep(0, length(expCol2)), groupLabel2="group2",
-                   header=TRUE, sep="", method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"),
-                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4,
-                   thresholdKind=1, outputDir="none", normalMethod=c("none", "loess", "median"),
-                   replicate1="none", geneColR1=1, expColR1=2, depthR1=rep(0, length(expColR1)), replicateLabel1="replicate1",
-                   replicate2="none", geneColR2=1, expColR2=2, depthR2=rep(0, length(expColR2)), replicateLabel2="replicate2", rawCount=TRUE){
-
-    geneExpMatrix1 <- readGeneExp(geneExpFile1, geneCol=geneCol1, valCol=expCol1, header=header, sep=sep)
-    geneExpMatrix2 <- readGeneExp(geneExpFile2, geneCol=geneCol2, valCol=expCol2, header=header, sep=sep)
-    replicateExpMatrix1 <- NULL
-    replicateExpMatrix2 <- NULL
-    if(method == "MATR"){
-      if((replicate1 == "none")||(replicate2 == "none")){
-        cat("You must provide two replicates for method MATR!")
-        cat("\n")
-        stop();
-      }
-      cat("replicate1: ",replicate1,"\n")
-      cat("replicate2: ",replicate2,"\n")
-      replicateExpMatrix1 <- readGeneExp(replicate1, geneCol=geneColR1, valCol=expColR1, header=header, sep=sep)
-      replicateExpMatrix2 <- readGeneExp(replicate2, geneCol=geneColR2, valCol=expColR2, header=header, sep=sep)
-    }
-    DEGexp(geneExpMatrix1=geneExpMatrix1, geneCol1=1, expCol1=(1:length(expCol1))+1, depth1=depth1, groupLabel1=groupLabel1,
-           geneExpMatrix2=geneExpMatrix2, geneCol2=1, expCol2=(1:length(expCol2))+1, depth2=depth2, groupLabel2=groupLabel2,
-           method=method,
-           pValue=pValue, zScore=zScore, qValue=qValue, foldChange=foldChange,
-           thresholdKind=thresholdKind, outputDir=outputDir, normalMethod=normalMethod,
-           replicateExpMatrix1=replicateExpMatrix1, geneColR1=1, expColR1=(1:length(expColR1))+1, depthR1=depthR1, replicateLabel1=replicateLabel1,
-           replicateExpMatrix2=replicateExpMatrix2, geneColR2=1, expColR2=(1:length(expColR2))+1, depthR2=depthR2, replicateLabel2=replicateLabel2, rawCount=rawCount)
-}

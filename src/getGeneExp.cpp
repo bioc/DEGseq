@@ -18,6 +18,7 @@
 #include <R_ext/Visibility.h>
 
 using namespace std;
+
 class Exon;
 int getCounts(string refFlatFile, vector<string> MapResultFiles, string outputFile, string Format, bool needSameStrand);
 int getCountsForOneSample(vector<Exon> exons, map<string,int> maxExonLen, vector<string> geneNames,
@@ -29,7 +30,8 @@ int getExonAnnotationFile2(char ** refFlatFile_str, char ** exonAnnotationFile);
 static int rows = 0;
 static double overlap_percent = 1;
 static bool addtionCol = false;
-static string path_sep = "\\";
+static string path_sep = "/";
+
 extern "C" {
 int getGeneExp(char ** refFlatFile_str, char ** MapResultFile_str, int * fileCount, char ** outputFile_str,
                  char ** Format_str, int * readlength_int, int * needSameStrand_int, double * overlapPercent)
@@ -84,12 +86,12 @@ int getGeneExp(char ** refFlatFile_str, char ** MapResultFile_str, int * fileCou
   return 0;
 }
 }
-extern "C" {
+
 int getExonAnnotationFile(char ** refFlatFile_str, char ** exonAnnotationFile)
 {
     return getExonAnnotationFile2(refFlatFile_str, exonAnnotationFile);
 }
-}
+
 
 int isDir(const char * name){
   struct stat buff;
@@ -201,7 +203,7 @@ class Exon{
                return start < e.start;
            }
            if(end != e.end){
-               return start < e.start;
+               return end < e.end;
            }
            if(strand != e.strand ){
                return strand < e.strand; //we assume "+" < "-"
@@ -240,6 +242,65 @@ ostream& operator<<(ostream& s, const Exon& exon) {
   return s<<exon.geneName<<"\t"<<exon.chr<<"\t"<<exon.start<<"\t"<<exon.end<<"\t"<<strand<<endl;
 }
 
+class Isoform{
+	public:
+     string geneName;
+     string id;
+     string chr;
+     int start;
+     int end;
+     int strand;
+     vector<Exon> exons;
+     Isoform(string geneName, string id, string chr, int start,int end, int strand, vector<Exon> exons)
+          :geneName(geneName), id(id), chr(chr),start(start),end(end),strand(strand), exons(exons){ }
+     //Isoform()
+     //     :geneName(""), id(""), chr(""),start(0),end(0),strand(0){}
+     inline bool operator<(const Isoform &i) const {
+     	     if(id != i.id){
+              return id < i.id;
+           }
+           if(chr != i.chr){
+               return chr < i.chr;
+           }
+           if(start != i.start){
+               return start < i.start;
+           }
+           if(end != i.end){
+               return end < i.end;
+           }
+           if(strand != i.strand ){
+               return strand < i.strand; //we assume "+" < "-"
+           }
+           if(geneName != i.geneName ){
+               return geneName < i.geneName;
+           }
+           return false;
+     }
+     inline bool operator==(const Isoform &i) const {
+           if(id != i.id){
+               return false;
+           }
+           return true;
+     }
+};
+
+ostream& operator<<(ostream& s, Isoform& isoform) {
+	 string strand("-");
+   if(isoform.strand==0){
+     strand="+";
+   }
+   s<<isoform.geneName<<"\t"<<isoform.id<<"\t"<<isoform.chr<<"\t"<<strand<<"\t"<<isoform.start<<"\t"<<isoform.end<<"\t";
+   for(vector<Exon>::iterator it=isoform.exons.begin();it!=isoform.exons.end();it++){
+   	   s<<it->start<<",";
+   }
+   s<<"\t";
+   for(vector<Exon>::iterator it=isoform.exons.begin();it!=isoform.exons.end();it++){
+   	   s<<it->end<<",";
+   }
+   s<<endl;
+   return s;
+}
+
 class Read{
     public:
        string chr;
@@ -258,7 +319,7 @@ class Read{
                return start < r.start;
            }
            if(end != r.end){
-               return start < r.start;
+               return end < r.end;
            }
            if(strand != r.strand ){
                return strand < r.strand; //we assume "+" < "-"
@@ -338,7 +399,58 @@ ostream& operator<<(ostream& s, const Read& read) {
   return s<<read.chr<<"\t"<<read.start<<"\t"<<read.end<<"\t"<<strand<<endl;
 }
 
-int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames, map<string,int>  & maxExonLen, map<string, int> & geneAveLen){
+int printIsoforms(ostream& s, map<string, vector<Isoform> > &gene2Isoforms, vector<string> &geneNames){
+  for(vector<string>::iterator it=geneNames.begin();it!=geneNames.end();it++){
+    	for(vector<Isoform>::iterator it2=gene2Isoforms[*it].begin();it2!=gene2Isoforms[*it].end();it2++){
+    	  	s<<(*it2);
+    	}
+  }
+  return 0;
+}
+
+int getGeneLength(map<string, vector<Isoform> > &gene2Isoforms, vector<string> &geneNames, map<string, int> & gene2TotalLen){ 
+	int isoforn_count=0;
+	for(vector<string>::iterator it=geneNames.begin();it!=geneNames.end();it++){
+    	sort(gene2Isoforms[*it].begin(), gene2Isoforms[*it].end());
+    	vector<Isoform>::iterator ptr = unique(gene2Isoforms[*it].begin(), gene2Isoforms[*it].end());
+      gene2Isoforms[*it].erase(ptr, gene2Isoforms[*it].end());
+
+      vector<Exon> AllExons;
+      for(vector<Isoform>::iterator it2=gene2Isoforms[*it].begin();it2!=gene2Isoforms[*it].end();it2++){
+      	  for(vector<Exon>::iterator it3=it2->exons.begin();it3!=it2->exons.end();it3++){
+      	  	  AllExons.push_back(*it3);
+      	  }
+      }
+      sort(AllExons.begin(), AllExons.end());
+      vector<Exon>::iterator ptr2 = unique(AllExons.begin(), AllExons.end());
+      AllExons.erase(ptr2, AllExons.end());
+
+      unsigned int point = 0;
+      isoforn_count++;
+      while(point < AllExons.size()-1){
+      	    if(AllExons[point].chr != AllExons[point+1].chr){
+      	    	 point++;
+      	    	 continue;
+      	    }
+      	    if(AllExons[point].end <= AllExons[point+1].start){
+      	    	 point++;
+      	    }else{
+      	    	 if(AllExons[point].end < AllExons[point+1].end){
+      	    	 	  AllExons[point].end = AllExons[point+1].end;
+      	    	 }
+      	    	 AllExons.erase(AllExons.begin()+point+1,AllExons.begin()+point+2);
+      	    }
+      }
+
+      int length=0;
+      for(vector<Exon>::iterator it6=AllExons.begin();it6!=AllExons.end();it6++){
+      	  length += (it6->end-it6->start);
+      }
+      gene2TotalLen[*it]=length;
+  }
+  return 0;
+}
+int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames, map<string,int>  & maxExonLen, map<string, int> & gene2TotalLen){
     exons.clear();
     ifstream in(refFlatFile.c_str());
     if(!in) {
@@ -347,7 +459,7 @@ int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames,
       return -1;
     }
     map<string, vector<int> > geneLen;
-    
+    map<string, vector<Isoform> > gene2Isoforms;
     int count=0;
     while (!in.eof()) {
          //printf("\r%d",count);
@@ -358,6 +470,7 @@ int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames,
              //buffer[strlen(buffer) - 1] = '\0';
          }
          int isoformLen=0;
+         vector<Exon> isoformExons;
          vector<string> blocks;
          string tmp = buffer;
          if(tmp.size()<10){
@@ -370,6 +483,9 @@ int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames,
          vector<string> begins;
          vector<string> end;
          string geneName = blocks[0];
+         string isoformId = blocks[1];
+         int isoformStart = atoi(blocks[4].c_str());
+         int isoformEnd = atoi(blocks[5].c_str());
          string chr=blocks[2];
          int strand=0;
          if(blocks[3]=="+"){
@@ -393,6 +509,7 @@ int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames,
              int end = atoi(exonEnd[iter].c_str());
              Exon exon(geneName,chr,start,end,strand);
              exons.push_back(exon);
+             isoformExons.push_back(exon);
              if(maxExonLen.count(chr) == 0){
                 maxExonLen[chr] = end-start;
              }else{
@@ -404,6 +521,16 @@ int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames,
              iter++;
          }
          geneNames.push_back(geneName);
+         
+         Isoform isoform(geneName, isoformId, chr, isoformStart, isoformEnd, strand, isoformExons);
+         if(gene2Isoforms.count(geneName) ==0){
+         	  vector <Isoform> tmp;
+         	  tmp.push_back(isoform);
+         	  gene2Isoforms[geneName] = tmp;
+         }else{
+            gene2Isoforms[geneName].push_back(isoform);
+         }
+         
          if(geneLen.count(geneName) ==0){
          	  vector <int> tmp;
          	  tmp.push_back(isoformLen);
@@ -422,15 +549,16 @@ int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames,
     geneNames.erase(ptr2, geneNames.end());
     Rprintf("total %d unique genes\n",(int)geneNames.size());
     R_FlushConsole();
-    
-    
-    for(vector<string>::iterator it=geneNames.begin();it!=geneNames.end();it++){
+    //ofstream out("/data1/lkwang/getGeneExp_20091105/isoform.txt");
+    //printIsoforms(out, gene2Isoforms, geneNames);
+    getGeneLength(gene2Isoforms, geneNames, gene2TotalLen);
+    /*for(vector<string>::iterator it=geneNames.begin();it!=geneNames.end();it++){
     	  int total_len = 0;
     	  for(vector<int>::iterator it2=geneLen[*it].begin();it2!=geneLen[*it].end();it2++){
     	  	  total_len += *it2;
     	  }
     	  geneAveLen[*it] = int(total_len/geneLen[*it].size());
-    }
+    }*/
     return 0;
 }
 
@@ -476,10 +604,10 @@ int findOverLapGenes(vector<Exon> & exons, Read & one_read, map<string,pair<int,
         if(exons[pos].start + maxExonLen[one_read.chr] < one_read.start){
            break;
         }
-	if((needSameStrand==true)&&(exons[pos].strand != one_read.strand)){
-	  pos--;
-	  continue;
-	}
+	      if((needSameStrand==true)&&(exons[pos].strand != one_read.strand)){
+	          pos--;
+	          continue;
+	      }
         if(one_read.overlap(exons[pos])+0.001 >= overLen){
            geneNames.push_back(exons[pos].geneName);
         }
@@ -541,7 +669,7 @@ void printResult2(string outputFile, vector<string> MapResultFiles, map<string, 
     }
 }
 void printResult3(string outputFile, vector<string> MapResultFiles, map<string, map<string, pair<int,int> > > & genesExp,
-                  vector<string> geneNames, map<string, int> & readsCount, map<string, int> geneAveLen){
+                  vector<string> geneNames, map<string, int> & readsCount, map<string, int> gene2TotalLen){
     ofstream out(outputFile.c_str());
     if(!out) {
       Rprintf("cannot open output file %s \n", outputFile.c_str());
@@ -555,15 +683,15 @@ void printResult3(string outputFile, vector<string> MapResultFiles, map<string, 
        out<<"\t"<<"\""<<get_file_name(*it)<<"(all reads)"<<"\"";
        total_reads += readsCount[*it];
     }
-    out<<"\t"<<"\"gene length (average of all possible isoform's length)\""<<endl;
+    out<<"\t"<<"\"gene length (union of all possible exon's length)\""<<endl;
     for(vector<string>::iterator it=geneNames.begin();it!=geneNames.end();it++){
        out<<*it;
        for(vector<string>::iterator it2=MapResultFiles.begin();it2!=MapResultFiles.end();it2++){
            out<<"\t"<<genesExp[*it2][*it].first;
-           out<<"\t"<<(((((double)genesExp[*it2][*it].first)*1000)/readsCount[*it2])*1000000)/geneAveLen[*it];
+           out<<"\t"<<(((((double)genesExp[*it2][*it].first)*1000)/readsCount[*it2])*1000000)/gene2TotalLen[*it];
            out<<"\t"<<readsCount[*it2];
        }
-       out<<"\t"<<geneAveLen[*it];
+       out<<"\t"<<gene2TotalLen[*it];
        out<<endl;
     }
 }
@@ -572,8 +700,8 @@ int getCounts(string refFlatFile, vector<string> MapResultFiles, string outputFi
     map<string,int>  maxExonLen; // chromoson --> int
     vector<string> geneNames;
     map<string, int> readsCount;
-    map<string, int> geneAveLen;
-    if(getExons(refFlatFile, exons, geneNames, maxExonLen, geneAveLen) < 0){
+    map<string, int> gene2TotalLen;
+    if(getExons(refFlatFile, exons, geneNames, maxExonLen, gene2TotalLen) < 0){
     	 Rprintf("There is something wrong!\n");
        Rprintf("Please check %s!\n", refFlatFile.c_str());
        return -1;
@@ -588,7 +716,7 @@ int getCounts(string refFlatFile, vector<string> MapResultFiles, string outputFi
           return -1;
        }
     }
-    printResult3(outputFile, MapResultFiles, genesExp, geneNames, readsCount, geneAveLen);
+    printResult3(outputFile, MapResultFiles, genesExp, geneNames, readsCount, gene2TotalLen);
     overlap_percent = 1;
     addtionCol = false;
     return 0;
@@ -751,11 +879,13 @@ int getExonAnnotationFile2(char ** refFlatFile_str, char ** exonAnnotationFile)
 
   }
   clock_t end = clock();
-  Rprintf("total %d unique exons\n", exons.size());
+  int exon_num = exons.size();
+  Rprintf("total %d unique exons\n", exon_num);
   Rprintf("total used %f seconds.\n",((double)end - start)/CLOCKS_PER_SEC);
   R_FlushConsole();
   return 0;
 }
+
 extern "C" {
   static R_NativePrimitiveArgType getGeneExp_t[] = {STRSXP, STRSXP, INTSXP, STRSXP, STRSXP, INTSXP, INTSXP, REALSXP};
   static R_NativePrimitiveArgType getExonAnnotationFile_t[] = {STRSXP, STRSXP};
