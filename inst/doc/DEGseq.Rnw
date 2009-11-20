@@ -146,6 +146,7 @@ m_2 & = & \widehat{E}(M|A=a)-4\cdot\sqrt{\widehat{Var}(M|A=a)} \\
 \end{eqnarray*}
 
 We call the lines obtained by above equations \textit{theoretical} four-fold local standard deviations lines.
+Please see \cite{Wang09} for detail.
 
 \subsection{MA-plot-based method with technical replicates}
 To estimate the noise level of genes with different intensity, 
@@ -165,6 +166,7 @@ For each transcript $g$ with ($A=a_g$, $M=m_g$) on the MA-plot, a \textit{Z-scor
 this transcript is differentially expressed, where $\mu_g$ is the local mean of $M$ and $\sigma_g$ is the local standard deviation 
 of $M$ conditioned on $A=a_g$ estimated by technical replicates. Finally, a \textit{P-value} is assigned to this gene according to 
 the \textit{Z-score} under the assumption of normal distribution.
+Please see \cite{Wang09} for detail.
 
 \section{Data}
 The test RNA-seq data are from \cite{Marioni08}. 
