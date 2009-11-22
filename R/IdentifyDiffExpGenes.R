@@ -105,7 +105,7 @@ output_SD <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001, 
   ##################################### sorting down 
   
   tmp <- cbind(PairGenes_v, expVals1_v, expVals2_v, MVal_v, Zscore_v, Pvalue_v, Qvalue_v1, Qvalue_v2, DfGenes_v)
-  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change) with no normalization\"",
+  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"",
                         "\"z-score\"","\"p-value\"","\"q-value(Benjamini et al. 1995)\"","\"q-value(Storey et al. 2003)\"",tmp_string))
   if(file != "none"){
      write.table(tmp,file=file,append=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
@@ -165,7 +165,7 @@ output_LRT <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001,
   ##################################### sorting down 
   
   tmp <- cbind(PairGenes_v, expVals1_v, expVals2_v, MVal_v, Pvalue_v, Qvalue_v1, Qvalue_v2, DfGenes_v)
-  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change) with no normalization\"",
+  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"",
                         "\"p-value\"","\"q-value(Benjamini et al. 1995)\"","\"q-value(Storey et al. 2003)\"",tmp_string))
   if(file != "none"){
      write.table(tmp,file=file,append=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
@@ -226,7 +226,7 @@ output_FET <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001,
   ##################################### sorting down 
 
   tmp <- cbind(PairGenes_v, expVals1_v, expVals2_v, MVal_v, Pvalue_v, Qvalue_v1, Qvalue_v2, DfGenes_v)
-  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change) with no normalization\"",
+  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"",
                         "\"p-value\"","\"q-value(Benjamini et al. 1995)\"","\"q-value(Storey et al. 2003)\"",tmp_string))
   if(file != "none"){
      write.table(tmp,file=file,append=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
@@ -242,7 +242,7 @@ output_FC <- function(rbatch, rpairraw, file, threshold=3){
   MVal_v <- MVal(rbatch)
   tmp <- cbind(PairGenes_v,expVals1_v,expVals2_v,MVal_v,DfGenes(rbatch))
   tmp_string <- paste("\"Signature(abs(log2(Fold_change)) > ", threshold,")\"",sep="")
-  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change) with no normalization\"",tmp_string))
+  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"",tmp_string))
   if(file != "none"){
      write.table(tmp,file=file,append=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
   }
