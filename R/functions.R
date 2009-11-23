@@ -8,7 +8,7 @@
 #######################################
 
 ReadLane <- function(file1, geneCol=1, valCol=2, label = NULL, header=TRUE, sep=""){
-   rt1 <- read.table(file1,header=header, sep=sep)
+   rt1 <- read.table(file1,header=header, sep=sep, row.names=NULL)
    
    exp_values <- as(rt1[valCol], "matrix")
    if(!is.numeric(exp_values)){

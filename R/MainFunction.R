@@ -17,13 +17,13 @@ DEGexp <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(exp
  normalMethod <- match.arg(normalMethod)
  for(i in (1:length(expCol1))){
    if(depth1[i] == -1){
-      rt1 <- read.table(geneExpFile1,header=header,sep=sep)
+      rt1 <- read.table(geneExpFile1,header=header,sep=sep,row.names=NULL)
       exp_values <- as(rt1[expCol1[i]+2], "matrix")
       exp_values[is.na(exp_values)] <- 0
       depth1[i] <- as.numeric(exp_values[1])
    }
    if(depth1[i] == 0){
-      rt1 <- read.table(geneExpFile1,header=header,sep=sep)
+      rt1 <- read.table(geneExpFile1,header=header,sep=sep,row.names=NULL)
       exp_values <- as(rt1[expCol1[i]], "matrix")
       exp_values[is.na(exp_values)] <- 0
       depth1[i] <- sum(exp_values)
@@ -33,13 +33,13 @@ DEGexp <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(exp
 
  for(i in (1:length(expCol2))){
    if(depth2[i] == -1){
-      rt1 <- read.table(geneExpFile2,header=header,sep=sep)
+      rt1 <- read.table(geneExpFile2,header=header,sep=sep,row.names=NULL)
       exp_values <- as(rt1[expCol2[i]+2], "matrix")
       exp_values[is.na(exp_values)] <- 0
       depth2[i] <- as.numeric(exp_values[1])
    }
    if(depth2[i] == 0){
-      rt1 <- read.table(geneExpFile2,header=header,sep=sep)
+      rt1 <- read.table(geneExpFile2,header=header,sep=sep,row.names=NULL)
       exp_values <- as(rt1[expCol2[i]], "matrix")
       exp_values[is.na(exp_values)] <- 0
       depth2[i] <- sum(exp_values)
@@ -49,13 +49,13 @@ DEGexp <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(exp
  if(method == "MATR"){
    for(i in (1:length(expColR1))){
        if(depthR1[i] == -1){
-           rt1 <- read.table(replicate1,header=header,sep=sep)
+           rt1 <- read.table(replicate1,header=header,sep=sep,row.names=NULL)
            exp_values <- as(rt1[expColR1[i]+2], "matrix")
 	         exp_values[is.na(exp_values)] <- 0
            depthR1[i] <- as.numeric(exp_values[1])
        }
        if(depthR1[i] == 0){
-           rt1 <- read.table(replicate1,header=header,sep=sep)
+           rt1 <- read.table(replicate1,header=header,sep=sep,row.names=NULL)
            exp_values <- as(rt1[expColR1[i]], "matrix")
 	         exp_values[is.na(exp_values)] <- 0
            depthR1[i] <- sum(exp_values)
@@ -63,13 +63,13 @@ DEGexp <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(exp
    }
    for(i in (1:length(expColR2))){
        if(depthR2[i] == -1){
-           rt1 <- read.table(replicate2,header=header,sep=sep)
+           rt1 <- read.table(replicate2,header=header,sep=sep,row.names=NULL)
            exp_values <- as(rt1[expColR2[i]+2], "matrix")
 	         exp_values[is.na(exp_values)] <- 0
            depthR2[i] <- as.numeric(exp_values[1])
        }
        if(depthR2[i] == 0){
-           rt1 <- read.table(replicate2,header=header,sep=sep)
+           rt1 <- read.table(replicate2,header=header,sep=sep,row.names=NULL)
            exp_values <- as(rt1[expColR2[i]], "matrix")
 	         exp_values[is.na(exp_values)] <- 0
            depthR2[i] <- sum(exp_values)      
