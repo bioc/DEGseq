@@ -337,32 +337,32 @@ DEGexp <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(exp
  }
  switch(method,
         "FC" = {  
-                  PairS1S2_result <- FindDiff_FC(PairS1S2_norm,threshold=foldChange,picfile=result_pic)
-                  output_FC(PairS1S2_result,PairS1S2,result_score,threshold=foldChange)
+                  PairS1S2_result <- FindDiff_FC(PairS1S2_norm,threshold=foldChange,picfile=result_pic,count1=count1,count2=count2)
+                  output_FC(PairS1S2_result,PairS1S2,result_score,threshold=foldChange,count1=count1,count2=count2)
                         },
         
         "MATR" = {
                   PairS1S2_result <- FindDiff_SD(PairS1S2_norm,PairC1C2_norm,,threshold=threshold,
                                                  pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,
                                                  thresholdKind=thresholdKind,picfile=result_pic,control=1)
-                  output_SD(PairS1S2_result,PairS1S2,result_score,pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind)
+                  output_SD(PairS1S2_result,PairS1S2,result_score,pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind,count1=count1,count2=count2)
                         },
        
         "MARS" = {
                   PairS1S2_result <- FindDiff_MARS(PairS1S2_norm,count1=count1,count2=count2,threshold=threshold,
                                                    pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,
                                                    thresholdKind=thresholdKind,picfile=result_pic)
-                  output_SD(PairS1S2_result,PairS1S2,result_score,pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind)
+                  output_SD(PairS1S2_result,PairS1S2,result_score,pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind,count1=count1,count2=count2)
                         },
         "LRT" = {
                   PairS1S2_result <- FindDiff_LRT(PairS1S2,count1=count1,count2=count2,picfile=result_pic,
                                                   pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind)
-                  output_LRT(PairS1S2_result,PairS1S2,result_score,pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind)
+                  output_LRT(PairS1S2_result,PairS1S2,result_score,pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind,count1=count1,count2=count2)
                         },
         "FET" = {
                   PairS1S2_result <- FindDiff_FET(PairS1S2,count1=count1,count2=count2,picfile=result_pic,
                                                   pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind)
-                  output_FET(PairS1S2_result,PairS1S2,result_score,pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind)
+                  output_FET(PairS1S2_result,PairS1S2,result_score,pvalue_t=pValue_threshold,qvalue_t=qValue_threshold,thresholdKind=thresholdKind,count1=count1,count2=count2)
                         },
         "CTR" = {
                   Check_TR(PairS1S2_norm,count1=count1,count2=count2,picfile=result_pic,pvalue_t=pValue_threshold)
