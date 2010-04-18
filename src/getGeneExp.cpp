@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <dirent.h>
+#include <time.h>  /* needed for clock_t, clock() and CLOCKS_PER_SEC */
 #include <sys/types.h>
 #include <sys/stat.h>
 
