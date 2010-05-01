@@ -177,7 +177,7 @@ Please see \cite{Marioni08} for more details.
 
 \section{Examples}
 \subsection{Example for DEGexp}
-If users already have the gene expression values (such as the number of reads mapped to each gene),
+If users already have the gene expression values (or the number of reads mapped to each gene),
 this method can be used to identify differentially expressed genes between two samples
 with or without multiple technical replicates directly.
 In the package, there are test data for this method. The file GeneExpExample5000.txt includes the first 5000 lines 
@@ -303,8 +303,8 @@ For example,
   exp <- readGeneExp(file=geneExpFile, geneCol=1, valCol=c(7,9,12,15,18,8,10,11,13,16))
   write.table(exp[30:32,], row.names=FALSE)
 @
-\section{Make use of the functions provided by rtracklayer and ShortRead to import files containing aligned reads}
-To import files containing aligned reads, users can make use of the functionas provided by rtracklayer and ShortRead.
+\section{Make use of the functions provided by ShortRead to import files containing aligned reads}
+To import files containing aligned reads, users can make use of the functionas provided by ShortRead.
 For example,
 <<echo=TRUE,print=FALSE>>=
   kidneyR1L1 <- system.file("extdata", "kidneyChr21Bowtie.txt", package="DEGseq")
@@ -326,7 +326,7 @@ To count the number of reads for each gene, we can use the method {\tt getGeneEx
   write.table(exp[30:32,], row.names=FALSE)
   cat("output: ", output, "\n")
 @
-See also {\tt ?DEGseq.rng} and {\tt ?getGeneExp.rng} for more detail.
+See {\tt ?DEGseq.aln} and {\tt ?getGeneExp.aln} for more detail.
 \section{The relation between DEGseq and edgeR}
 The package \Rpackage{edgeR} implements the method based on negative 
 binominal distribution to model overdispersion relative to Poisson for digital 

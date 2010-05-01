@@ -56,20 +56,6 @@ getGeneExp.aln <- function(alnBatch, strandInfo=FALSE, refFlat, output=paste(map
   getGeneExp(mapResultBatch, strandInfo=strandInfo, refFlat=refFlat, output=output, min.overlapPercent=min.overlapPercent)
 }
 
-getGeneExp.rng <- function(rngBatch, strandInfo=FALSE, refFlat, output=paste(mapResultBatch[1],".exp",sep=""), 
-                           min.overlapPercent=1){
-  rngCount <- length(rngBatch)
-  mapResultBatch <- rep("", rngCount)
-  for(i in (1:rngCount)){
-      mapResultBatch[i] <- paste(tempdir(),"/rng",i,".bed",sep="")
-      if(!is(rngBatch[[i]], "RangedData")){
-         stop("The object is not an object of class RangedData!\n")
-      }
-      rtracklayer::export(rngBatch[[i]], mapResultBatch[i], format="bed")
-  }
-  getGeneExp(mapResultBatch, strandInfo=strandInfo, refFlat=refFlat, output=output, min.overlapPercent=min.overlapPercent)
-}
-
 getExonAnnotationFile <- function(refFlat, output){
   kk <- .C(".getExonAnnotationFile",as.character(refFlat),as.character(output))
 }
@@ -267,104 +253,6 @@ DEGseq.aln <- function(alnBatch1, alnBatch2,
      depth2 <- rep(-1, length(alnBatch2))
      cDepth1 <- rep(-1, length(replicateAlnBatch1))
      cDepth2 <- rep(-1, length(replicateAlnBatch2))
-  }
-
-  DEGexp(geneExpMatrix1, 1, expCol1, depth1, groupLabel1,
-         geneExpMatrix2, 1, expCol2, depth2, groupLabel2,
-	       method=method, pValue=pValue, zScore=zScore, foldChange=foldChange, qValue=qValue, thresholdKind=thresholdKind,
-         replicateExpMatrix1=replicateExpMatrix1, geneColR1=1, expColR1=expColR1, depthR1=cDepth1,
-         replicateExpMatrix2=replicateExpMatrix2, geneColR2=1, expColR2=expColR2, depthR2=cDepth2,
-	       replicateLabel1=replicateLabel1, replicateLabel2=replicateLabel2,
-         outputDir=outputDir, normalMethod=normalMethod)
-} 
-
-
-DEGseq.rng <- function(rngBatch1, rngBatch2,
-                   strandInfo=FALSE, refFlat, groupLabel1="group1", groupLabel2="group2",
-                   method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"), 
-                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4, thresholdKind=1,
-                   outputDir="none", normalMethod=c("none", "loess", "median"),
-                   depthKind=1, replicateRngBatch1=NULL, replicateRngBatch2=NULL,
-                   replicateLabel1="replicate1", replicateLabel2="replicate2"){
-  
-  method <- match.arg(method)
-  normalMethod <- match.arg(normalMethod)
-  cat("Please wait...\n")
-  if(outputDir == "none"){
-     cat("\noutputDir is not definite!")
-     stop("\n")
-     cat("Only generate statistic summary report graphs!\n")
-  }
-  if(outputDir != "none"){
-     dir.create(outputDir, showWarnings = FALSE, recursive = TRUE)
-     dir.create(paste(outputDir,"/output",sep=""), showWarnings = FALSE, recursive = TRUE)
-  }else{
-     ## outputDir <- tempdir()
-  }
-  if((outputDir != "none")&&(file.access(outputDir, mode = 0) != 0)){
-    cat("Can not creat ",outputDir, "\n")
-    stop("\n")
-  }
-      
-  #cat("file format:",fileFormat,"\n")
-  cat("refFlat: ",refFlat,"\n")
-  if(method == "MATR"){
-     if(is.null(replicateRngBatch1)||is.null(replicateRngBatch2)){
-        cat("You must provide two replicate rng batches for method MATR!")
-        cat("\n")
-        stop();
-     }
-  }
-
-  
-  if(strandInfo == TRUE){
-     cat("Consider the strand information when count the reads mapped to genes!\n")
-  }else{
-     cat("Ignore the strand information when count the reads mapped to genes!\n")
-  }
-
-  flush.console();
-  
-  GeneExp1 <- paste(outputDir,"/",groupLabel1,".exp",sep="");
-  GeneExp2 <- paste(outputDir,"/",groupLabel2,".exp",sep="");
-  unlink(GeneExp1)
-  unlink(GeneExp2)
-  cat("Count the number of reads mapped to each gene ... \n");
-  cat("This will take several minutes, please wait patiently!\n")
-  flush.console();
-  geneExpMatrix1 <- getGeneExp.rng(rngBatch1, strandInfo, refFlat, GeneExp1)
-  geneExpMatrix2 <- getGeneExp.rng(rngBatch2, strandInfo, refFlat, GeneExp2)
-  ControlExp1 <- paste(outputDir,"/", replicateLabel1, ".exp",sep="");
-  ControlExp2 <- paste(outputDir,"/", replicateLabel2, ".exp",sep="");
-
-  replicateExpMatrix1 <- NULL
-  replicateExpMatrix2 <- NULL
-  if(method == "MATR"){
-     unlink(ControlExp1)
-     unlink(ControlExp2)
-     replicateExpMatrix1 <- getGeneExp.rng(replicateRngBatch1, strandInfo, refFlat, ControlExp1)
-     replicateExpMatrix2 <- getGeneExp.rng(replicateRngBatch2, strandInfo, refFlat, ControlExp2)
-  }else{
-     ControlExp1 <- "none"
-     ControlExp2 <- "none"
-  }
-
-  
-  expCol1 <- seq(2, by=3, length=length(rngBatch1))
-  expCol2 <- seq(2, by=3, length=length(rngBatch2))
-  expColR1 <- seq(2, by=3, length=length(replicateRngBatch1))
-  expColR2 <- seq(2, by=3, length=length(replicateRngBatch2))
-  
-  if(depthKind == 0){
-     depth1 <- rep(0, length(rngBatch1))
-     depth2 <- rep(0, length(rngBatch2))
-     cDepth1 <- rep(0, length(replicateRngBatch1))
-     cDepth2 <- rep(0, length(replicateRngBatch2))
-  }else{
-     depth1 <- rep(-1, length(rngBatch1))
-     depth2 <- rep(-1, length(rngBatch2))
-     cDepth1 <- rep(-1, length(replicateRngBatch1))
-     cDepth2 <- rep(-1, length(replicateRngBatch2))
   }
 
   DEGexp(geneExpMatrix1, 1, expCol1, depth1, groupLabel1,

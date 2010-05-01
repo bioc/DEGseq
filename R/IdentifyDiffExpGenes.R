@@ -38,8 +38,12 @@ getQvalue2 <- function(Pvalue_v){
       Pvalue_tmp <- Pvalue_v[!is.na(Pvalue_v)]
       Pvalue_tmp[Pvalue_tmp > 1] <- 1
       Pvalue_tmp[Pvalue_tmp < 0] <- 0
-      res <- qvalue(Pvalue_tmp)
-      Qvalue_v[index_v] <- res$qvalues
+      tmp2 <- try({res <- qvalue(Pvalue_tmp);Qvalue_v[index_v] <- res$qvalues})
+      if(class(tmp2) =="try-error"){
+         cat("Warning: The default values for qvalue function are not suitable!!!\n")
+         cat("Ouput qvalues(Benjamini et al. 1995) instead.\n")
+         Qvalue_v  <- getQvalue1(Pvalue_v)
+      }
    }else{
       cat("Warning:fail to load library qvalue(Storey et al. 2003)!\n")
       cat("Only ouput qvalue(Benjamini et al. 1995).\n")   
@@ -48,7 +52,7 @@ getQvalue2 <- function(Pvalue_v){
 }
 
 
-output_SD <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001, thresholdKind=1){
+output_SD <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001, thresholdKind=1, count1, count2){
     
   expVals1_v <- expVals1(rpairraw)
   expVals2_v <- expVals2(rpairraw)
@@ -101,18 +105,19 @@ output_SD <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001, 
       Pvalue_v <- Pvalue_v[order(Qvalue_v2)]
       Qvalue_v2 <- Qvalue_v2[order(Qvalue_v2)]
       tmp_string <- paste("\"Signature(q-value(Storey et al. 2003) < ",qvalue_t,")\"",sep="")
-  }  
+  }
+  MVal_v_n <- MVal_v+ log(count2/count1,2)
   ##################################### sorting down 
   
-  tmp <- cbind(PairGenes_v, expVals1_v, expVals2_v, MVal_v, Zscore_v, Pvalue_v, Qvalue_v1, Qvalue_v2, DfGenes_v)
-  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"",
+  tmp <- cbind(PairGenes_v, expVals1_v, expVals2_v, MVal_v,MVal_v_n, Zscore_v, Pvalue_v, Qvalue_v1, Qvalue_v2, DfGenes_v)
+  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"","\"log2(Fold_change) normalized\"",
                         "\"z-score\"","\"p-value\"","\"q-value(Benjamini et al. 1995)\"","\"q-value(Storey et al. 2003)\"",tmp_string))
   if(file != "none"){
      write.table(tmp,file=file,append=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
   }
 }
 
-output_LRT <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001, thresholdKind=1){
+output_LRT <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001, thresholdKind=1,count1, count2){
   
   expVals1_v <- expVals1(rpairraw)
   expVals2_v <- expVals2(rpairraw)
@@ -161,18 +166,19 @@ output_LRT <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001,
       Pvalue_v <- Pvalue_v[order(Qvalue_v2)]
       Qvalue_v2 <- Qvalue_v2[order(Qvalue_v2)]
       tmp_string <- paste("\"Signature(q-value(Storey et al. 2003) < ",qvalue_t,")\"",sep="")
-  }  
+  }
+  MVal_v_n <- MVal_v+ log(count2/count1,2)
   ##################################### sorting down 
   
-  tmp <- cbind(PairGenes_v, expVals1_v, expVals2_v, MVal_v, Pvalue_v, Qvalue_v1, Qvalue_v2, DfGenes_v)
-  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"",
+  tmp <- cbind(PairGenes_v, expVals1_v, expVals2_v, MVal_v,MVal_v_n, Pvalue_v, Qvalue_v1, Qvalue_v2, DfGenes_v)
+  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"","\"log2(Fold_change) normalized\"",
                         "\"p-value\"","\"q-value(Benjamini et al. 1995)\"","\"q-value(Storey et al. 2003)\"",tmp_string))
   if(file != "none"){
      write.table(tmp,file=file,append=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
   }
 }
 
-output_FET <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001, thresholdKind=1){
+output_FET <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001, thresholdKind=1,count1, count2){
   
   expVals1_v <- expVals1(rpairraw)
   expVals2_v <- expVals2(rpairraw)
@@ -223,10 +229,11 @@ output_FET <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001,
       Qvalue_v2 <- Qvalue_v2[order(Qvalue_v2)]
       tmp_string <- paste("\"Signature(q-value(Storey et al. 2003) < ",qvalue_t,")\"",sep="")
   }  
+  MVal_v_n <- MVal_v+ log(count2/count1,2)
   ##################################### sorting down 
 
-  tmp <- cbind(PairGenes_v, expVals1_v, expVals2_v, MVal_v, Pvalue_v, Qvalue_v1, Qvalue_v2, DfGenes_v)
-  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"",
+  tmp <- cbind(PairGenes_v, expVals1_v, expVals2_v, MVal_v,MVal_v_n, Pvalue_v, Qvalue_v1, Qvalue_v2, DfGenes_v)
+  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"","\"log2(Fold_change) normalized\"",
                         "\"p-value\"","\"q-value(Benjamini et al. 1995)\"","\"q-value(Storey et al. 2003)\"",tmp_string))
   if(file != "none"){
      write.table(tmp,file=file,append=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
@@ -234,15 +241,16 @@ output_FET <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001,
 }
 
 
-output_FC <- function(rbatch, rpairraw, file, threshold=3){
+output_FC <- function(rbatch, rpairraw, file, threshold=3, count1, count2){
   expVals1_v <- expVals1(rpairraw)
   expVals2_v <- expVals2(rpairraw)
   PairGenes_v <- PairGenes(rbatch)
   AVal_v <- AVal(rbatch)
   MVal_v <- MVal(rbatch)
-  tmp <- cbind(PairGenes_v,expVals1_v,expVals2_v,MVal_v,DfGenes(rbatch))
-  tmp_string <- paste("\"Signature(abs(log2(Fold_change)) > ", threshold,")\"",sep="")
-  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"",tmp_string))
+  MVal_v_n <- MVal_v+ log(count2/count1,2)
+  tmp <- cbind(PairGenes_v,expVals1_v,expVals2_v,MVal_v,MVal_v_n,DfGenes(rbatch))
+  tmp_string <- paste("\"Signature(abs(log2(Fold_change) normalized) > ", threshold,")\"",sep="")
+  dimnames(tmp) <- list(c(),c("\"GeneNames\"","\"value1\"","\"value2\"","\"log2(Fold_change)\"","\"log2(Fold_change) normalized\"",tmp_string))
   if(file != "none"){
      write.table(tmp,file=file,append=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
   }
@@ -786,7 +794,7 @@ FindDiff_FET <- function(rbatch, count1=0, count2=0, pvalue_t=0.001,
 }
 
 
-FindDiff_FC<-function(rbatch, threshold=3, picfile=NULL){   
+FindDiff_FC<-function(rbatch, threshold=3, picfile=NULL, count1, count2){   
   if(is(rbatch, "PairNorm")){
     rbatch<-Norm2Result(rbatch)
   }else{
@@ -803,13 +811,13 @@ FindDiff_FC<-function(rbatch, threshold=3, picfile=NULL){
     if(is.na(A[i]))
        next
     z_sore[i] <- 0
-    if(abs(M[i]) > threshold){
+    if(abs(M[i]+log(count2/count1,2)) > threshold){
        points(A[i],M[i],pch=".",col="red")
     }
   }
-  abline(h=threshold,col="red",lwd=1,lty=3)
-  abline(h=-threshold,col="red",lwd=1,lty=3)
-  DiffGenes <- (abs(M) > threshold)
+  abline(h=threshold-log(count2/count1,2),col="red",lwd=1,lty=3)
+  abline(h=-threshold+log(count2/count1,2),col="red",lwd=1,lty=3)
+  DiffGenes <- (abs(M+log(count2/count1,2)) > threshold)
   DiffGenes[is.na(DiffGenes)] <- FALSE
   Zscore(rbatch) <- cbind(z_sore)
   DfGenes(rbatch) <- cbind(DiffGenes)
