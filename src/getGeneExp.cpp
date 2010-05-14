@@ -500,6 +500,19 @@ int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames,
          }
          vector<string> exonSrt;
          vector<string> exonEnd;
+         
+         if(blocks[9][0] == '\"'){
+            blocks[9]=blocks[9].substr(1);
+         }
+         if(blocks[9][blocks[9].size()-1] == '\"'){
+            blocks[9]=blocks[9].substr(0, blocks[9].size()-1);
+         }
+         if(blocks[10][0] == '\"'){
+            blocks[10]=blocks[10].substr(1);
+         }
+         if(blocks[10][blocks[10].size()-1] == '\"'){
+            blocks[10]=blocks[10].substr(0, blocks[10].size()-1);
+         }
 
          string2tokens(blocks[9],exonSrt,',');
          string2tokens(blocks[10],exonEnd,',');

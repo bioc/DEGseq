@@ -90,14 +90,13 @@ DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
 
   Storey,J.D. and Tibshirani,R. (2003) Statistical significance for genomewide studies. \emph{Proc. Natl. Acad. Sci.} \bold{100}, 9440-9445.
   
-  Wang,L.K. and et al. (2009) DEGseq: an R package to identify differentially expressed genes from RNA-seq data. Submitted.
+  Wang,L.K. and et al. (2010) DEGseq: an R package for identifying differentially expressed genes from RNA-seq data, \emph{Bioinformatics} \bold{26}, 136 - 138.
   
   Yang,Y.H. et al. (2002) Normalization for cDNA microarray data: a robust composite method addressing single and multiple
   slide systematic variation. \emph{Nucleic Acids Research}, \bold{30}, e15.
 }
 \seealso{
  \code{\link{DEGexp}},
- \code{\link{DEGseq.rng}},
  \code{\link{DEGseq.aln}},
  \code{\link{getGeneExp}},
  \code{\link{readGeneExp}},

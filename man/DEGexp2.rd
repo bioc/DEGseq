@@ -2,7 +2,7 @@
 \alias{DEGexp2}
 \title{DEGexp2: Identifying Differentially Expressed Genes from gene expression data}
 \description{
-   This function is another version of DEGexp. It takes the gene expression files as input instead of gene expression matrixs.  
+   This function is another (old) version of DEGexp. It takes the gene expression files as input instead of gene expression matrixs.  
 }
 \usage{
 DEGexp2(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), groupLabel1="group1",
@@ -96,7 +96,7 @@ DEGexp2(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), gro
   
   Storey,J.D. and Tibshirani,R. (2003) Statistical significance for genomewide studies. \emph{Proc. Natl. Acad. Sci.} \bold{100}, 9440-9445.
 
-  Wang,L.K. and et al. (2009) DEGseq: an R package to identify differentially expressed genes from RNA-seq data. Submitted.
+  Wang,L.K. and et al. (2010) DEGseq: an R package for identifying differentially expressed genes from RNA-seq data, \emph{Bioinformatics} \bold{26}, 136 - 138.
     
   Yang,Y.H. et al. (2002) Normalization for cDNA microarray data: a robust composite method addressing single and multiple
   slide systematic variation. \emph{Nucleic Acids Research}, \bold{30}, e15.
