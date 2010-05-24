@@ -85,7 +85,9 @@ samWrapper <- function(geneExpFile1, geneCol1=1, expCol1=2, measure1=rep(1, leng
    groups <- cbind(group1, group2)
    len <- length(groups[groups==0])
    # groups <- groups[keep(groups,measure1,measure2),]
-   groups[groups==0] <- sample(seq(0,min_value,by=min_value/(len*100)),length(groups[groups==0]))
+   if(len > 0){
+      groups[groups==0] <- sample(seq(0,min_value,by=min_value/(len*100)),length(groups[groups==0]))
+   }
    Measure <- as.vector(cbind(matrix(measure1, nrow=1), matrix(measure2, nrow=1)))
    if(paired==FALSE){
       check.format(Measure, "Two class unpaired")
