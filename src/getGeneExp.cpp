@@ -465,8 +465,8 @@ int getExons(string refFlatFile, vector<Exon> &exons, vector<string> &geneNames,
     while (!in.eof()) {
          //printf("\r%d",count);
          count++;
-         char buffer[10000 + 1];
-         in.getline(buffer, 10000);
+         char buffer[1000000 + 1];
+         in.getline(buffer, 1000000);
          if (buffer[strlen(buffer) - 1] == '\r'){
              //buffer[strlen(buffer) - 1] = '\0';
          }
@@ -763,8 +763,8 @@ int getCountsForOneSample(vector<Exon> exons, map<string,int> maxExonLen, vector
       length=0;
     }
     while(!in.eof()){
-      char buffer[10000 + 1];
-      in.getline(buffer, 10000);
+      char buffer[1000000 + 1];
+      in.getline(buffer, 1000000);
       if (buffer[strlen(buffer) - 1] == '\r'){
           buffer[strlen(buffer) - 1] = '\0';
       }
