@@ -615,6 +615,10 @@ int findOverLapGenes(vector<Exon> & exons, Read & one_read, map<string,pair<int,
         if(exons[pos].chr < one_read.chr){
            break;
         }
+        if(exons[pos].chr > one_read.chr){
+           pos--;
+           continue;
+        }
         if(exons[pos].start + maxExonLen[one_read.chr] < one_read.start){
            break;
         }
