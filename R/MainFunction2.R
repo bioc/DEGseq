@@ -6,7 +6,7 @@
 DEGexp2 <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), groupLabel1="group1",
                    geneExpFile2, geneCol2=1, expCol2=2, depth2=rep(0, length(expCol2)), groupLabel2="group2",
                    header=TRUE, sep="", method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"),
-                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4,
+                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=2,
                    thresholdKind=1, outputDir="none", normalMethod=c("none", "loess", "median"),
                    replicate1="none", geneColR1=1, expColR1=2, depthR1=rep(0, length(expColR1)), replicateLabel1="replicate1",
                    replicate2="none", geneColR2=1, expColR2=2, depthR2=rep(0, length(expColR2)), replicateLabel2="replicate2", rawCount=TRUE){
@@ -108,7 +108,7 @@ DEGexp2 <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(ex
  qValue_threshold <- qValue
  threshold <- zScore
  
- if((thresholdKind != 1)&&(thresholdKind != 2)&&(thresholdKind != 3)&&(thresholdKind != 4)){
+ if((thresholdKind != 1)&&(thresholdKind != 2)&&(thresholdKind != 3)&&(thresholdKind != 4)&&(thresholdKind != 5)){
      cat("Wrong value for thresholdKind!\n")
      cat("Use default value for thresholdKind.\n")
      thresholdKind <- 1
@@ -131,6 +131,12 @@ DEGexp2 <- function(geneExpFile1, geneCol1=1, expCol1=2, depth1=rep(0, length(ex
       pValue_threshold <- 0
       threshold <- 4
       cat("qValue threshold (Storey et al. 2003):",qValue_threshold,"\n")
+   }
+   if(thresholdKind == 5){
+      pValue_threshold <- 0
+      threshold <- foldChange
+      cat("qValue threshold (Storey et al. 2003):",qValue_threshold,"\n")
+      cat("log2 fold change:", foldChange,"\n")
    }
  }
  

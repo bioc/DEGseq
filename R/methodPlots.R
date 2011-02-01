@@ -446,7 +446,7 @@ LineOnPlot<-function(pair,
 
 png_new <- function(file,file_dir=""){
  # png(file=file)
- if((file_dir != "none")&&(file != "none")){ 
+ if((file_dir != "none")&&(file != "none")){
    if(file_dir != ""){
       file <- paste(file_dir,"/",file,sep="")
    }

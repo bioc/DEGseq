@@ -68,43 +68,45 @@ output_SD <- function(rbatch, rpairraw, file, pvalue_t=0.0001, qvalue_t=0.0001, 
   Qvalue_v1 <- Qvalue(rbatch)
   Qvalue_v2 <- Qvalue2(rbatch)
   
-  
+  #################################### sort
+  tmp <- Zscore_v
+  tmp[(!is.na(tmp))&(tmp < 0)] <- tmp[(!is.na(tmp))&(tmp < 0)]*(-1);
+  order_matrix <- order(tmp, decreasing=TRUE)
+  expVals1_v <- expVals1_v[order_matrix]
+  expVals2_v <- expVals2_v[order_matrix]
+  PairGenes_v <- PairGenes_v[order_matrix]
+  MVal_v <- MVal_v[order_matrix]
+  DfGenes_v <- DfGenes(rbatch)[order_matrix]
+  Qvalue_v1 <- Qvalue_v1[order_matrix]
+  Pvalue_v <- Pvalue_v[order_matrix]
+  Qvalue_v2 <- Qvalue_v2[order_matrix]
+  Zscore_v <- Zscore_v[order_matrix]
+  ####################################
+  order_matrix <- order(DfGenes_v, decreasing=TRUE)
+  ####################################
+  expVals1_v <- expVals1_v[order_matrix]
+  expVals2_v <- expVals2_v[order_matrix]
+  PairGenes_v <- PairGenes_v[order_matrix]
+  MVal_v <- MVal_v[order_matrix]
+  DfGenes_v <- DfGenes_v[order_matrix]
+  Qvalue_v1 <- Qvalue_v1[order_matrix]
+  Pvalue_v <- Pvalue_v[order_matrix]
+  Qvalue_v2 <- Qvalue_v2[order_matrix]
+  Zscore_v <- Zscore_v[order_matrix]
   #################################### sort 
+  
   tmp_string <- paste("\"Signature(p-value < ",pvalue_t,")\"",sep="")
   if((thresholdKind ==1)||(thresholdKind ==2)){
-      expVals1_v <- expVals1_v[order(Pvalue_v)]
-      expVals2_v <- expVals2_v[order(Pvalue_v)]
-      PairGenes_v <- PairGenes_v[order(Pvalue_v)]
-      MVal_v <- MVal_v[order(Pvalue_v)]
-      Zscore_v <- Zscore_v[order(Pvalue_v)]
-      DfGenes_v <- DfGenes(rbatch)[order(Pvalue_v)]
-      Qvalue_v1 <- Qvalue_v1[order(Pvalue_v)]
-      Qvalue_v2 <- Qvalue_v2[order(Pvalue_v)]
-      Pvalue_v <- Pvalue_v[order(Pvalue_v)]
+      tmp_string <- paste("\"Signature(p-value < ",pvalue_t,")\"",sep="")
   }
   if(thresholdKind ==3){
-      expVals1_v <- expVals1_v[order(Qvalue_v1)]
-      expVals2_v <- expVals2_v[order(Qvalue_v1)]
-      PairGenes_v <- PairGenes_v[order(Qvalue_v1)]
-      MVal_v <- MVal_v[order(Qvalue_v1)]
-      Zscore_v <- Zscore_v[order(Qvalue_v1)]
-      DfGenes_v <- DfGenes(rbatch)[order(Qvalue_v1)]
-      Qvalue_v2 <- Qvalue_v2[order(Qvalue_v1)]
-      Pvalue_v <- Pvalue_v[order(Qvalue_v1)]
-      Qvalue_v1 <- Qvalue_v1[order(Qvalue_v1)]
       tmp_string <- paste("\"Signature(q-value(Benjamini et al. 1995) < ",qvalue_t,")\"",sep="")
   }
   if(thresholdKind ==4){
-      expVals1_v <- expVals1_v[order(Qvalue_v2)]
-      expVals2_v <- expVals2_v[order(Qvalue_v2)]
-      PairGenes_v <- PairGenes_v[order(Qvalue_v2)]
-      MVal_v <- MVal_v[order(Qvalue_v2)]
-      Zscore_v <- Zscore_v[order(Qvalue_v2)]
-      DfGenes_v <- DfGenes(rbatch)[order(Qvalue_v2)]
-      Qvalue_v1 <- Qvalue_v1[order(Qvalue_v2)]
-      Pvalue_v <- Pvalue_v[order(Qvalue_v2)]
-      Qvalue_v2 <- Qvalue_v2[order(Qvalue_v2)]
       tmp_string <- paste("\"Signature(q-value(Storey et al. 2003) < ",qvalue_t,")\"",sep="")
+  }
+  if(thresholdKind ==5){
+     tmp_string <- paste("\"Signature(q-value(Storey et al. 2003) < ",qvalue_t,")\"",sep="")
   }
   MVal_v_n <- MVal_v+ log(count2/count1,2)
   ##################################### sorting down 
@@ -492,7 +494,7 @@ FindDiff_SD<-function(rbatch, cbatch, pvalue_t=0.0001, threshold=4, picfile=NULL
   rbatch
 } 
 
-FindDiff_MARS <-function(rbatch, count1=0, count2=0, threshold=4, pvalue_t=0.0001,
+FindDiff_MARS <-function(rbatch, count1=0, count2=0, threshold=2, pvalue_t=0.0001,
                          qvalue_t=0.0001, thresholdKind=1, picfile=NULL, new_window=TRUE, dev_off=TRUE){
   if(is(rbatch, "PairNorm")){
     rbatch<-Norm2Result(rbatch)
@@ -501,7 +503,7 @@ FindDiff_MARS <-function(rbatch, count1=0, count2=0, threshold=4, pvalue_t=0.000
   }
   
   if(threshold <= 0){
-     threshold <- 4
+     threshold <- 2
   }
   
   if(!is.null(picfile))
@@ -572,6 +574,15 @@ FindDiff_MARS <-function(rbatch, count1=0, count2=0, threshold=4, pvalue_t=0.000
            points(AVal(rbatch)[i],MVal(rbatch)[i],pch=".",col="red")
         }
     }
+    if(thresholdKind == 5){
+        if((Qvalue_v2[i] <  qvalue_t)&&(abs(MVal(rbatch)[i]+log(count2/count1,2)) > threshold)&&(expVals1(rbatch)[i] > log(5,2)-0.2)&&(expVals2(rbatch)[i] > log(5,2)-0.2)){
+           points(AVal(rbatch)[i],MVal(rbatch)[i],pch=".",col="red")
+        }else{
+           if(Qvalue_v2[i] <  qvalue_t){
+                points(AVal(rbatch)[i],MVal(rbatch)[i],pch=".",col=6)
+           }
+        }
+    }
   }
   if((thresholdKind == 1)||(thresholdKind == 2)){
      DiffGenes <- Pvalue_v < pvalue_t
@@ -581,6 +592,11 @@ FindDiff_MARS <-function(rbatch, count1=0, count2=0, threshold=4, pvalue_t=0.000
   }
   if(thresholdKind == 4){
      DiffGenes <- Qvalue_v2 < qvalue_t
+  }
+  if(thresholdKind == 5){
+     DiffGenes <- (Qvalue_v2 < qvalue_t)&(abs(MVal(rbatch)+log(count2/count1,2)) > threshold)&(expVals1(rbatch) > log(5,2)-0.2)&(expVals2(rbatch) > log(5,2)-0.2)
+     abline(threshold-log(count2/count1,2),0,col=8,lwd=2)
+     abline(-threshold-log(count2/count1,2),0,col=8,lwd=2)
   }
   DiffGenes[is.na(DiffGenes)] <- FALSE  
   if((thresholdKind == 1)||(thresholdKind == 2)){
