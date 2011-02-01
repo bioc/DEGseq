@@ -64,7 +64,7 @@ getExonAnnotationFile <- function(refFlat, output){
 DEGseq <- function(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
                    strandInfo=FALSE, refFlat, groupLabel1="group1", groupLabel2="group2",
                    method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"), 
-                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4, thresholdKind=1,
+                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=2, thresholdKind=1,
                    outputDir="none", normalMethod=c("none", "loess", "median"),
                    depthKind=1, replicate1="none", replicate2="none",
                    replicateLabel1="replicate1", replicateLabel2="replicate2"){
@@ -171,7 +171,7 @@ DEGseq <- function(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLengt
 DEGseq.aln <- function(alnBatch1, alnBatch2,
                    strandInfo=FALSE, refFlat, groupLabel1="group1", groupLabel2="group2",
                    method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"), 
-                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4, thresholdKind=1,
+                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=2, thresholdKind=1,
                    outputDir="none", normalMethod=c("none", "loess", "median"),
                    depthKind=1, replicateAlnBatch1=NULL, replicateAlnBatch2=NULL,
                    replicateLabel1="replicate1", replicateLabel2="replicate2"){
