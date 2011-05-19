@@ -9,7 +9,7 @@
 DEGexp(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), groupLabel1="group1",
        geneExpMatrix2, geneCol2=1, expCol2=2, depth2=rep(0, length(expCol2)), groupLabel2="group2",
        method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"), 
-       pValue=1e-3, zScore=4, qValue=1e-3, foldChange=2, 
+       pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4, 
        thresholdKind=1, outputDir="none", normalMethod=c("none", "loess", "median"),
        replicateExpMatrix1=NULL, geneColR1=1, expColR1=2, depthR1=rep(0, length(expColR1)), replicateLabel1="replicate1",
        replicateExpMatrix2=NULL, geneColR2=1, expColR2=2, depthR2=rep(0, length(expColR2)), replicateLabel2="replicate2", rawCount=TRUE)
@@ -53,8 +53,8 @@ DEGexp(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), gr
                   \item \code{1}:  pValue threshold, 
                   \item \code{2}:  zScore threshold,
                   \item \code{3}:  qValue threshold (Benjamini et al. 1995),
-                  \item \code{4}:  qValue threshold (Storey et al. 2003).
-                  \item \code{5}:  qValue threshold (Storey et al. 2003)and Fold-Change threshold on MA-plot.
+                  \item \code{4}:  qValue threshold (Storey et al. 2003),
+                  \item \code{5}:  qValue threshold (Storey et al. 2003) and Fold-Change threshold on MA-plot are both required (can be used only when \code{method="MARS"}).
                  }
                }
   \item{foldChange}{fold change threshold on MA-plot (for the method: \code{FC}).}

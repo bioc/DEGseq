@@ -6,13 +6,17 @@
 DEGexp <- function(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(expCol1)), groupLabel1="group1",
                    geneExpMatrix2, geneCol2=1, expCol2=2, depth2=rep(0, length(expCol2)), groupLabel2="group2",
                    method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"),
-                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=2,
+                   pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4,
                    thresholdKind=1, outputDir="none", normalMethod=c("none", "loess", "median"),
                    replicateExpMatrix1=NULL, geneColR1=1, expColR1=2, depthR1=rep(0, length(expColR1)), replicateLabel1="replicate1",
                    replicateExpMatrix2=NULL, geneColR2=1, expColR2=2, depthR2=rep(0, length(expColR2)), replicateLabel2="replicate2", rawCount=TRUE){
     
  dev_cur <- dev.cur();
  cat("Please wait...\n")
+ #######
+ foldChange_bak <- foldChange
+ foldChange <- log(foldChange, 2)
+ #######
  method <- match.arg(method)
  normalMethod <- match.arg(normalMethod)
  depth1 <- as.numeric(depth1)
@@ -104,6 +108,12 @@ DEGexp <- function(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(e
      cat("Use default value for thresholdKind.\n")
      thresholdKind <- 1
  }
+ if((thresholdKind == 5)&&(method != "MARS")){
+     cat("thresholdKind  can be set to 5, only if method = MARS !\n")
+     cat("Wrong value for thresholdKind!\n")
+     cat("Use default value for thresholdKind.\n")
+     thresholdKind <- 1
+ }
  if(method != "FC"){
    if(thresholdKind == 2){
       cat("zScore threshold:",threshold,"\n")
@@ -127,11 +137,13 @@ DEGexp <- function(geneExpMatrix1, geneCol1=1, expCol1=2, depth1=rep(0, length(e
       pValue_threshold <- 0
       threshold <- foldChange
       cat("qValue threshold (Storey et al. 2003):",qValue_threshold,"\n")
+      cat("fold change:", foldChange_bak,"\n")
       cat("log2 fold change:", foldChange,"\n")
    }
  }
  
  if(method == "FC"){
+    cat("fold change:", foldChange_bak,"\n")
     cat("log2 fold change:", foldChange,"\n")
  }
 
