@@ -10,7 +10,7 @@
 DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
        strandInfo=FALSE, refFlat, groupLabel1="group1", groupLabel2="group2",
        method=c("LRT", "CTR", "FET", "MARS", "MATR", "FC"), 
-       pValue=1e-3, zScore=4, qValue=1e-3, foldChange=2, thresholdKind=1,
+       pValue=1e-3, zScore=4, qValue=1e-3, foldChange=4, thresholdKind=1,
        outputDir="none", normalMethod=c("none", "loess", "median"),
        depthKind=1, replicate1="none", replicate2="none",
        replicateLabel1="replicate1", replicateLabel2="replicate2")
@@ -58,7 +58,8 @@ DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
                   \item \code{1}:  pValue threshold, 
                   \item \code{2}:  zScore threshold,
                   \item \code{3}:  qValue threshold (Benjamini et al. 1995),
-                  \item \code{4}:  qValue threshold (Storey et al. 2003).
+                  \item \code{4}:  qValue threshold (Storey et al. 2003),
+                  \item \code{5}:  qValue threshold (Storey et al. 2003) and Fold-Change threshold on MA-plot are both required (can be used only when \code{method="MARS"}).
                  }
                }
   \item{foldChange}{fold change threshold on MA-plot (for the method: \code{FC}).}

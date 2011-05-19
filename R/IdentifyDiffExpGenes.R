@@ -575,8 +575,9 @@ FindDiff_MARS <-function(rbatch, count1=0, count2=0, threshold=2, pvalue_t=0.000
         }
     }
     if(thresholdKind == 5){
-        if((Qvalue_v2[i] <  qvalue_t)&&(abs(MVal(rbatch)[i]+log(count2/count1,2)) > threshold)&&(expVals1(rbatch)[i] > log(5,2)-0.2)&&(expVals2(rbatch)[i] > log(5,2)-0.2)){
+        if((Qvalue_v2[i] <  qvalue_t)&&(abs(MVal(rbatch)[i]+log(count2/count1,2)) > threshold)&&(1)&&(1)){
            points(AVal(rbatch)[i],MVal(rbatch)[i],pch=".",col="red")
+           points(AVal(rbatch)[i],MVal(rbatch)[i],pch="+",col="red")
         }else{
            if(Qvalue_v2[i] <  qvalue_t){
                 points(AVal(rbatch)[i],MVal(rbatch)[i],pch=".",col=6)
@@ -594,7 +595,7 @@ FindDiff_MARS <-function(rbatch, count1=0, count2=0, threshold=2, pvalue_t=0.000
      DiffGenes <- Qvalue_v2 < qvalue_t
   }
   if(thresholdKind == 5){
-     DiffGenes <- (Qvalue_v2 < qvalue_t)&(abs(MVal(rbatch)+log(count2/count1,2)) > threshold)&(expVals1(rbatch) > log(5,2)-0.2)&(expVals2(rbatch) > log(5,2)-0.2)
+     DiffGenes <- (Qvalue_v2 < qvalue_t)&(abs(MVal(rbatch)+log(count2/count1,2)) > threshold)
      abline(threshold-log(count2/count1,2),0,col=8,lwd=2)
      abline(-threshold-log(count2/count1,2),0,col=8,lwd=2)
   }
