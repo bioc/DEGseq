@@ -12,4 +12,3 @@ Collate: AllClasses.R AllGenerics.R Bind.R methodPlots.R NormMethods.R
          functions.R IdentifyDiffExpGenes.R MainFunction.R MainFunctionWrap.R
          samWrapper.R MainFunction2.R
 LazyLoad: yes
-Packaged: 2011-04-14 07:28:46 UTC; biocbuild
