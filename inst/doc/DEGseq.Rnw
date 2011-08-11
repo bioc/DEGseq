@@ -224,8 +224,8 @@ layout(matrix(c(1,2,3,4,5,6), 3, 2, byrow=TRUE))
 par(mar=c(2, 2, 2, 2))
 DEGexp(geneExpMatrix1=geneExpMatrix1, expCol1=2, groupLabel1="kidneyR1L1", 
        geneExpMatrix2=geneExpMatrix2, expCol2=2, groupLabel2="liverR1L2",
-       replicateExpMatrix1=geneExpMatrix1, expColR1=3, replicateExpMatrix2=geneExpMatrix1, expColR2=4,
-       replicateLabel1="kidneyR1L3", replicateLabel2="kidneyR1L7",
+       replicateExpMatrix1=geneExpMatrix1, expColR1=3, replicateLabel1="kidneyR1L3", 
+       replicateExpMatrix2=geneExpMatrix1, expColR2=4, replicateLabel2="kidneyR1L7",
        method="MATR")
 @
 \end{center}
@@ -327,25 +327,7 @@ To count the number of reads for each gene, we can use the method {\tt getGeneEx
   cat("output: ", output, "\n")
 @
 See {\tt ?DEGseq.aln} and {\tt ?getGeneExp.aln} for more detail.
-\section{The relation between DEGseq and edgeR}
-The package \Rpackage{edgeR} implements the method based on negative 
-binominal distribution to model overdispersion relative to Poisson for digital 
-gene expression data with small replicates \citep{Robinson07}. 
-The methods in \Rpackage{edgeR} first estimate the dispersion
-and then construct an exact test similar to the Fisher's exact test 
-for contingency tables but replacing the 
-hypergeometric probabilities with negative binomial. 
-According to current published RNA-seq data, typically this technology has low instrument 
-noise and the Poisson model fits data well.
-In this situation, \cite{Robinson09} recommended users perform the methods with 
-the dispersion parameter $\phi$ set to 0 
-(as $\phi\rightarrow0$, the negative binominal distribution reduces to the Poisson).
 
-Some methods in \Rpackage{DEGseq} are also based on the Poisson model. But the MA-plot-based methods 
-employ MA-plot to identify and visualize significant genes. Besides, our package can help users 
-calculate the count of reads mapped to each gene with the gene annotation file in UCSC refFlat format.
-The methods in the two packages complement each other. Both the packages can be used to identify significant genes
-from RNA-seq data.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\newpage
