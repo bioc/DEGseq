@@ -86,25 +86,7 @@ Norm2Result <- function(from){
 #######################
 ###########################################################################
 #################################################################
-exportAlnAsBed <- function(aln, output){
-  if(!is(aln, "AlignedRead")){
-     stop("aln is not an object of class AlignedRead\n")
-  }
-  aln <- aln[!is.na(position(aln))]
-  string <- as.character(sread(aln))
-  chromosome <- as.character(chromosome(aln))
-  start <- position(aln)-1
-  end <- start + nchar(string)
-  start <- formatC(start, format="f", digits=11, drop0trailing=FALSE)
-  end <- formatC(end, format="f", digits=11, drop0trailing=FALSE)
-  id <- as.character(id(aln))
-  score <- as.numeric(quality(alignQuality(aln)))
-  score[is.na(score)] <- 0
-  strand <- as.character(strand(aln))
-  strand[(strand != "+")&(strand != "-")] <- "+"
-  result <- cbind(chromosome, start, end, id, score, strand)
-  write.table(result, col.name=FALSE, row.name=FALSE, file=output,quote=FALSE, sep="\t")
-}
+
 #######################################
 DEV_OFF <- function(off=TRUE, dev_cur=2){    
  for(i in dev.list())

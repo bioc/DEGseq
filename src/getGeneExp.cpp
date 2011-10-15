@@ -651,7 +651,7 @@ void printResult(string outputFile, map<string,pair<int,int> > & genesExp, vecto
     ofstream out(outputFile.c_str());
     if(!out) {
       cout<<string("cannot open output file ") + outputFile<<endl;
-      exit(0);
+      return;
     }
     out<<"\"geneName\"\t"<<"\"reads uniquely mapped to this gene\"\t"
             <<"\"reads mapped to this gene\"\t"<<"\"reads uniquely mapped to genome\""<<endl;

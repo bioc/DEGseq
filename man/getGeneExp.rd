@@ -52,7 +52,6 @@ getGeneExp(mapResultBatch, fileFormat="bed", readLength=32, strandInfo=FALSE,
 \seealso{
  \code{\link{DEGexp}},
  \code{\link{DEGseq}},
- \code{\link{getGeneExp.aln}},
  \code{\link{readGeneExp}},
  \code{\link{kidneyChr21.bed}},
  \code{\link{liverChr21.bed}},

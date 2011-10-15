@@ -98,7 +98,6 @@ DEGseq(mapResultBatch1, mapResultBatch2, fileFormat="bed", readLength=32,
 }
 \seealso{
  \code{\link{DEGexp}},
- \code{\link{DEGseq.aln}},
  \code{\link{getGeneExp}},
  \code{\link{readGeneExp}},
  \code{\link{kidneyChr21.bed}},
