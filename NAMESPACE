@@ -4,7 +4,7 @@ importClassesFrom(methods, call, character, matrix)
 importFrom(graphics, abline, boxplot, hist, lines, par,
           plot, points, text)
 importFrom(grDevices, bitmap, dev.list, dev.off, png)
-importFrom(methods, "@<-", as, is, new, slot, "slot<-")
+importFrom(methods, as, is, new, slot, "slot<-")
 importFrom(stats, density, dpois, ecdf, fisher.test, loess,
           loess.control, lowess, median, na.omit, pchisq, pnorm,
           predict, qnorm, sd)
