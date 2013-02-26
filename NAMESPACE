@@ -1,4 +1,4 @@
-##Namespace file for DEGseq package
+###Namespace file for DEGseq package
 useDynLib(DEGseq,.registration = TRUE)
 importClassesFrom(methods, call, character, matrix)
 importFrom(graphics, abline, boxplot, hist, lines, par,
