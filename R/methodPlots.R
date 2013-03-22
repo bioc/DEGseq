@@ -451,7 +451,7 @@ png_new <- function(file,file_dir=""){
       file <- paste(file_dir,"/",file,sep="")
    }
    options(warn=-1)
-   tmp <- try(png(file=file,units="px",width=480, height=480),silent = TRUE)
+   tmp <- try(png(filename=file,units="px",width=480, height=480),silent = TRUE)
    if(class(tmp) =="try-error") {
       tmp2 <- try(bitmap(file=file, type = "png16",res=144, width=4, height=4),silent = TRUE)
       if(class(tmp2) =="try-error"){

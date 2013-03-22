@@ -757,7 +757,7 @@ FindDiff_FET <- function(rbatch, count1=0, count2=0, pvalue_t=0.001,
       }
       o1 <- ceiling(value1[i])
       o2 <- ceiling(value2[i])
-      alleles <- matrix(c(o1,o2,count1-o1,count2-o2), nr=2)
+      alleles <- matrix(c(o1,o2,count1-o1,count2-o2), nrow=2)
       fisher_result <- fisher.test(alleles)
       Pvalue_v[i] <- fisher_result$p.value
   }

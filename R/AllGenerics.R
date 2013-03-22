@@ -130,7 +130,7 @@ if(!isGeneric("MVal"))
    setGeneric("MVal", function(object) standardGeneric("MVal"))
    setMethod("MVal", "lanePair",
    function(object){
-     M<-matrix(nr=0,nc=0)
+     M<-matrix(nrow=0,ncol=0)
      if((length(expVals1(object))!=0) & (length(expVals2(object))!=0))
          M<-LogVal1(object)-LogVal2(object)
      M
@@ -141,7 +141,7 @@ if(!isGeneric("AVal"))
    setGeneric("AVal", function(object) standardGeneric("AVal"))
    setMethod("AVal", "lanePair",
    function(object){
-     A<-matrix(nr=0,nc=0)
+     A<-matrix(nrow=0,ncol=0)
      if((length(expVals1(object))!=0) & (length(expVals2(object))!=0))
         A<-(LogVal1(object)+LogVal2(object))/2
      A
