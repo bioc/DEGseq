@@ -650,7 +650,7 @@ int findOverLapGenes(vector<Exon> & exons, Read & one_read, map<string,pair<int,
 void printResult(string outputFile, map<string,pair<int,int> > & genesExp, vector<string> geneNames){
     ofstream out(outputFile.c_str());
     if(!out) {
-      cout<<string("cannot open output file ") + outputFile<<endl;
+      Rprintf("cannot open output file %s \n", outputFile.c_str());
       return;
     }
     out<<"\"geneName\"\t"<<"\"reads uniquely mapped to this gene\"\t"
