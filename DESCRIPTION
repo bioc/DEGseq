@@ -1,11 +1,11 @@
 Package: DEGseq
 Title: Identify Differentially Expressed Genes from RNA-seq data
-Version: 1.19.0
-Author: Likun Wang <wanglikun@tsinghua.edu.cn> and Xi Wang
+Version: 1.19.1
+Author: Likun Wang <wanglk@hsc.pku.edu.cn> and Xi Wang
         <wang-xi05@mails.tsinghua.edu.cn>.
 Description: DEGseq is an R package to identify differentially
         expressed genes from RNA-Seq data.
-Maintainer: Likun Wang <wanglikun@tsinghua.edu.cn>
+Maintainer: Likun Wang <wanglk@hsc.pku.edu.cn>
 Depends: R (>= 2.8.0), qvalue, samr, methods
 Imports: graphics, grDevices, methods, stats, utils
 License: LGPL (>=2)
