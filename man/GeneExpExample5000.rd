@@ -13,7 +13,6 @@
  \code{\link{DEGexp}},
  \code{\link{getGeneExp}},
  \code{\link{readGeneExp}},
- \code{\link{samWrapper}},
  \code{\link{GeneExpExample1000}}.
 }
 \keyword{datasets}

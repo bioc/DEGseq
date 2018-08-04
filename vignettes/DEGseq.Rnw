@@ -256,28 +256,7 @@ And then it invokes {\tt DEGexp} to identify significant genes.
 To compare two sets of samples with multiple replicates or two groups of samples from different individuals 
 (e.g. disease samples vs. control samples), we provided a method which employs the methods in package \Rpackage{samr}. 
 The strategy used in \Rpackage{samr} was first described in \cite{Tusher01}, 
-and is used for significance analysis of microarrays.
-
-
-\begin{center}
-<<echo=TRUE,print=FALSE,results=hide>>=
-  geneExpFile <- system.file("extdata", "GeneExpExample1000.txt", package="DEGseq")
-  set.seed(100)
-  geneExpFile1 <- geneExpFile 
-  geneExpFile2 <- geneExpFile
-  output <- file.path(tempdir(), "samWrapperOut.txt")
-  expCol1=c(7,9,12,15,18)
-  expCol2=c(8,10,11,13,16)
-  measure1=c(-1,-2,-3,-4,-5)
-  measure2=c(1,2,3,4,5)
-  samWrapper(geneExpFile1=geneExpFile1, geneCol1=1, expCol1=expCol1, measure1=measure1,
-             geneExpFile2=geneExpFile2, geneCol2=1, expCol2=expCol2, measure2=measure2,
-             nperms=100, min.foldchange=2, max.qValue=1e-4, output=output, paired=TRUE)
-@
-\end{center}
-\noindent
-For the advanced users, please see samr \url{http://cran.r-project.org/web/packages/samr/index.html}
-for detail. 
+and is used for significance analysis of microarrays. Note: This function was removed from version 1.34.1.
 
 \subsection{Example for getGeneExp}
 This method is used to count the number of reads mapped to each gene for one sample.
