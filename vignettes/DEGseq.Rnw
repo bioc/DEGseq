@@ -18,15 +18,15 @@
 
 \begin{document}
 \title{\bf How to use the DEGseq Package}
-\author{Likun Wang$^1$$^,$$^2$ and Xi Wang$^1$.}
+\author{Likun Wang$^1$$^,$$^2$, Xiaowo Wang$^1$ and Xuegong Zhang$^1$.}
 \maketitle
 \noindent
 $^1$MOE Key Laboratory of Bioinformatics and Bioinformatics Division, TNLIST /Department
 of Automation, Tsinghua University.\\
 \noindent
-$^2$College of Computer Science and Technology, Jilin University.
+$^2$Department of Biomedical Informatics, School of Basic Medical Sciences, Peking University Health Science Center.
 \begin{center}
-{\tt wanglikun@tsinghua.edu.cn}
+{\tt wanglk@pku.edu.cn; xwwang@tsinghua.edu.cn; zhangxg@tsinghua.edu.cn}
 \end{center}
 \tableofcontents
 
